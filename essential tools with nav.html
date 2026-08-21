@@ -147,9 +147,11 @@
                     <span id="decimalBadge" class="text-slate-500 font-mono text-[11px]">(1.778)</span>
                 </div>
 
-                <!-- Mode Toggle -->
+                <!-- Mode Toggle (Crop / Pad / Outline) -->
                 <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
                     <button id="modeCrop" class="view-mode-btn px-2.5 py-1 text-[11px] font-medium rounded-lg bg-blue-600 text-white transition">Crop</button>
+                    <button id="modePad" class="view-mode-btn px-2.5 py-1 text-[11px] font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">Pad</button>
+                    <button id="modeOutline" class="view-mode-btn px-2.5 py-1 text-[11px] font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">Outline</button>
                 </div>
             </div>
 
@@ -749,7 +751,9 @@
 
         // Mode Switchers
         const modes = [
-            { btn: document.getElementById('modeCrop'), mode: 'crop' }
+            { btn: document.getElementById('modeCrop'), mode: 'crop' },
+            { btn: document.getElementById('modePad'), mode: 'pad' },
+            { btn: document.getElementById('modeOutline'), mode: 'outline' }
         ];
 
         modes.forEach(m => {
