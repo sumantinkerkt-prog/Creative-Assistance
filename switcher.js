@@ -1,8 +1,9 @@
 /*
  * Creative Assistance - Page Switcher
  * -----------------------------------
- * One shared file that puts the same "jump to any page" control on every page
- * of the app. Include it once per page, just before </body>:
+ * One shared file that puts the same navigation dock on every page of the app.
+ * All pages are shown as icons at all times, so switching is a single click.
+ * Include it once per page, just before </body>:
  *
  *     <script src="switcher.js"></script>
  *
@@ -27,25 +28,21 @@
         {
             file: 'index.html',
             label: 'Home',
-            hint: 'Projects, tasks & notes',
             icon: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>'
         },
         {
             file: 'text-studio.html',
             label: 'Text Studio',
-            hint: 'Write, transform & count',
             icon: '<path d="M4 6h16"/><path d="M4 12h11"/><path d="M4 18h7"/>'
         },
         {
             file: 'image-analyzer.html',
             label: 'Image Analyzer',
-            hint: 'Aspect ratios & AI sizes',
             icon: '<path d="M5 3v13a2 2 0 0 0 2 2h13"/><path d="M19 21V8a2 2 0 0 0-2-2H4"/>'
         },
         {
             file: 'compress-and-upscale.html',
             label: 'Compress & Upscale',
-            hint: 'Shrink or enlarge files',
             icon: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 14-2.5 3.5h13L14 10l-3 4"/><circle cx="9" cy="8.5" r="1.4"/>'
         }
     ];
@@ -70,69 +67,53 @@
     }
 
     var CURRENT = currentFile();
-    var activePage = null;
-    for (var i = 0; i < PAGES.length; i++) {
-        if (PAGES[i].file.toLowerCase() === CURRENT) { activePage = PAGES[i]; break; }
-    }
 
     var STYLES = [
         ':host{all:initial;position:fixed;right:20px;bottom:20px;z-index:2147483000;',
         'font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}',
         '*{box-sizing:border-box;margin:0;padding:0;}',
-        '.wrap{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}',
 
-        /* the always-visible button */
-        '.fab{display:inline-flex;align-items:center;gap:9px;cursor:pointer;',
-        'background:rgba(19,27,44,.92);color:#e2e8f0;border:1px solid rgba(148,163,184,.22);',
-        'border-radius:999px;padding:11px 16px;font-size:13px;font-weight:600;line-height:1;',
+        /* the dock: always on screen, every page shown at once */
+        '.dock{display:flex;align-items:center;gap:4px;padding:6px;',
+        'background:rgba(19,27,44,.92);border:1px solid rgba(148,163,184,.22);border-radius:999px;',
         '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);',
-        'box-shadow:0 10px 30px -8px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.35);',
-        'transition:transform .18s ease,border-color .18s ease,background .18s ease;}',
-        '.fab:hover{transform:translateY(-2px);border-color:rgba(99,102,241,.55);background:rgba(26,35,51,.96);}',
-        '.fab:active{transform:translateY(0);}',
-        '.fab:focus-visible{outline:2px solid #6366f1;outline-offset:3px;}',
-        '.fab .grid{color:#818cf8;flex:none;}',
-        '.fab .name{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
-        '.fab .chev{color:#64748b;flex:none;transition:transform .2s ease;}',
-        '.open .fab .chev{transform:rotate(180deg);}',
+        'box-shadow:0 12px 34px -10px rgba(0,0,0,.75),0 2px 6px rgba(0,0,0,.35);}',
 
-        /* the list of pages */
-        '.panel{position:absolute;right:0;bottom:calc(100% + 10px);width:270px;',
-        'background:rgba(15,22,38,.97);border:1px solid rgba(148,163,184,.2);border-radius:16px;',
-        '-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:8px;',
-        'box-shadow:0 24px 60px -12px rgba(0,0,0,.85);',
-        'opacity:0;transform:translateY(8px) scale(.97);transform-origin:bottom right;',
-        'pointer-events:none;transition:opacity .18s ease,transform .18s ease;}',
-        '.open .panel{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}',
-        '.cap{padding:8px 10px 10px;font-size:10px;font-weight:700;letter-spacing:.09em;',
-        'text-transform:uppercase;color:#64748b;}',
-        '.item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;',
-        'padding:9px 10px;border-radius:11px;text-decoration:none;color:#cbd5e1;',
-        'transition:background .15s ease,color .15s ease;}',
-        '.item+.item{margin-top:2px;}',
-        '.item:hover{background:rgba(99,102,241,.14);color:#f1f5f9;}',
-        '.item:focus-visible{outline:2px solid #6366f1;outline-offset:-2px;}',
-        '.ic{flex:none;width:32px;height:32px;display:grid;place-items:center;border-radius:9px;',
-        'background:rgba(99,102,241,.13);color:#818cf8;border:1px solid rgba(99,102,241,.2);}',
-        '.txt{min-width:0;flex:1;display:flex;flex-direction:column;}',
-        '.lbl{display:block;font-size:13px;font-weight:600;line-height:1.3;',
-        'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
-        '.hint{display:block;font-size:11px;color:#64748b;line-height:1.3;margin-top:2px;',
-        'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
-        '.item.here{background:rgba(16,185,129,.12);color:#f1f5f9;cursor:default;}',
-        '.item.here .ic{background:rgba(16,185,129,.16);color:#34d399;border-color:rgba(16,185,129,.28);}',
-        '.badge{flex:none;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;',
-        'color:#34d399;background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.28);',
-        'border-radius:999px;padding:3px 7px;}',
+        /* one tab per page - a single click goes straight there */
+        '.tab{position:relative;flex:none;display:inline-flex;align-items:center;justify-content:center;',
+        'gap:8px;width:40px;height:40px;border-radius:999px;text-decoration:none;color:#94a3b8;',
+        'border:1px solid transparent;',
+        'transition:background .15s ease,color .15s ease,border-color .15s ease;}',
+        '.tab:hover{background:rgba(99,102,241,.16);color:#e2e8f0;}',
+        '.tab:focus-visible{outline:2px solid #6366f1;outline-offset:2px;}',
+        '.tab svg{flex:none;}',
 
-        /* small screens: shrink to just the icon */
+        /* the page you are on: highlighted and named, so you always know where you are */
+        '.tab.here{width:auto;padding:0 14px;background:rgba(16,185,129,.15);color:#d1fae5;',
+        'border-color:rgba(16,185,129,.32);cursor:default;}',
+        '.tab.here svg{color:#34d399;}',
+        '.name{display:none;font-size:12.5px;font-weight:600;line-height:1;white-space:nowrap;',
+        'max-width:150px;overflow:hidden;text-overflow:ellipsis;}',
+        '.tab.here .name{display:block;}',
+
+        /* hover label for the other pages */
+        '.tip{position:absolute;bottom:calc(100% + 9px);right:-6px;',
+        'background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:8px;',
+        'padding:5px 9px;font-size:11px;font-weight:600;line-height:1;white-space:nowrap;',
+        'box-shadow:0 8px 20px -6px rgba(0,0,0,.7);',
+        'opacity:0;transform:translateY(3px);pointer-events:none;',
+        'transition:opacity .15s ease,transform .15s ease;}',
+        '.tab:hover .tip,.tab:focus-visible .tip{opacity:1;transform:translateY(0);}',
+        '.tab.here .tip{display:none;}',
+
+        /* small screens */
         '@media (max-width:560px){',
-        ':host{right:14px;bottom:14px;}',
-        '.fab{padding:11px 13px;}',
-        '.fab .name,.fab .chev{display:none;}',
-        '.panel{width:min(84vw,260px);}',
+        ':host{right:12px;bottom:12px;}',
+        '.tab{width:38px;height:38px;}',
+        '.tab.here{padding:0 12px;}',
+        '.name{max-width:96px;font-size:12px;}',
         '}',
-        '@media (prefers-reduced-motion:reduce){.fab,.panel,.chev{transition:none;}}',
+        '@media (prefers-reduced-motion:reduce){.tab,.tip{transition:none;}}',
         '@media print{:host{display:none;}}'
     ].join('');
 
@@ -152,73 +133,30 @@
         var root = host.attachShadow ? host.attachShadow({ mode: 'open' }) : null;
         if (!root) return; /* very old browser: skip rather than break the page */
 
-        var gridIcon = svg('<rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/>' +
-            '<rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/>', 16);
-        var chevIcon = svg('<path d="m6 15 6-6 6 6"/>', 14);
-
-        var items = PAGES.map(function (page) {
-            var here = activePage && page.file === activePage.file;
-            return '<a class="item' + (here ? ' here' : '') + '"' +
-                (here ? ' aria-current="page"' : '') +
-                ' href="' + esc(page.file) + '">' +
-                '<span class="ic">' + svg(page.icon, 17) + '</span>' +
-                '<span class="txt"><span class="lbl">' + esc(page.label) + '</span>' +
-                '<span class="hint">' + esc(page.hint) + '</span></span>' +
-                (here ? '<span class="badge">Here</span>' : '') +
+        var tabs = PAGES.map(function (page) {
+            var here = page.file.toLowerCase() === CURRENT;
+            return '<a class="tab' + (here ? ' here' : '') + '"' +
+                ' href="' + esc(page.file) + '"' +
+                ' aria-label="' + esc(page.label) + '"' +
+                (here ? ' aria-current="page"' : '') + '>' +
+                svg(page.icon, 18) +
+                '<span class="name">' + esc(page.label) + '</span>' +
+                '<span class="tip">' + esc(page.label) + '</span>' +
                 '</a>';
         }).join('');
 
         root.innerHTML =
             '<style>' + STYLES + '</style>' +
-            '<div class="wrap" part="wrap">' +
-            '<nav class="panel" aria-label="All pages">' +
-            '<div class="cap">Go to page</div>' + items +
-            '</nav>' +
-            '<button class="fab" type="button" aria-expanded="false" aria-label="Switch page">' +
-            '<span class="grid">' + gridIcon + '</span>' +
-            '<span class="name">' + esc(activePage ? activePage.label : 'Pages') + '</span>' +
-            '<span class="chev">' + chevIcon + '</span>' +
-            '</button>' +
-            '</div>';
+            '<nav class="dock" aria-label="App pages">' + tabs + '</nav>';
 
-        document.body.appendChild(host);
-
-        var wrap = root.querySelector('.wrap');
-        var fab = root.querySelector('.fab');
-        var firstLink = root.querySelector('.item:not(.here)');
-
-        function setOpen(open, moveFocus) {
-            wrap.classList.toggle('open', open);
-            fab.setAttribute('aria-expanded', open ? 'true' : 'false');
-            if (open && moveFocus && firstLink) firstLink.focus();
-        }
-
-        fab.addEventListener('click', function (event) {
-            event.stopPropagation();
-            /* detail 0 means the button was activated by keyboard, not a mouse -
-               only then does jumping focus into the list help rather than distract */
-            setOpen(!wrap.classList.contains('open'), event.detail === 0);
-        });
-
-        /* clicking the page you are already on does nothing but close the list */
-        root.querySelectorAll('.item.here').forEach(function (link) {
-            link.addEventListener('click', function (event) {
+        /* clicking the page you are already on should do nothing */
+        root.querySelectorAll('.tab.here').forEach(function (tab) {
+            tab.addEventListener('click', function (event) {
                 event.preventDefault();
-                setOpen(false);
             });
         });
 
-        document.addEventListener('click', function (event) {
-            var path = event.composedPath ? event.composedPath() : [];
-            if (path.indexOf(host) === -1) setOpen(false);
-        });
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape' && wrap.classList.contains('open')) {
-                setOpen(false);
-                fab.focus();
-            }
-        });
+        document.body.appendChild(host);
     }
 
     if (document.readyState === 'loading') {
