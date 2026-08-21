@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <meta name="description" content="A free, private workspace for creative work. Plan projects, track tasks and use handy everyday tools. No sign-up, no server — everything saves on your own device.">
+  <meta name="theme-color" content="#0b0d17">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Creative Assistance">
+  <meta property="og:description" content="Plan projects, track tasks and use handy creative tools — right in your browser.">
+</head>
+<body data-page="dashboard" data-title="Dashboard">
+
+  <div id="site-header"></div>
+
+  <main>
+    <div class="wrap">
+
+      <section class="hero">
+        <span class="eyebrow"><span class="eyebrow__dot"></span> No sign-up · Nothing uploaded</span>
+        <h1><span data-site-name>Creative Assistance</span></h1>
+        <p class="hero__lead" data-site-tagline>Plan projects, track tasks and use handy creative tools — right in your browser.</p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="workflow.html">Open Workflow</a>
+          <a class="btn btn--ghost" href="essential-tools.html">Browse Tools</a>
+        </div>
+      </section>
+
+      <!-- Live numbers -->
+      <section class="section">
+        <div id="stats" class="grid grid--stats"></div>
+      </section>
+
+      <!-- Due soon / overdue -->
+      <section class="section">
+        <div id="attention"></div>
+      </section>
+
+      <!-- Projects -->
+      <section class="section">
+        <h2>Your projects</h2>
+        <div id="projectList" class="grid grid--cards"></div>
+      </section>
+
+      <!-- Backup / restore -->
+      <section class="section">
+        <div id="dataPanel"></div>
+      </section>
+
+      <!-- Written content: explains the product, and gives search engines
+           something real to read. -->
+      <section class="section">
+        <h2>How it works</h2>
+        <div class="grid grid--halves">
+
+          <div class="card">
+            <h3>1. Group your work into projects</h3>
+            <p class="muted mb-0">A project is simply a container for related work — a client job, a video, a launch, a piece of writing. Give it a name, a colour and a one-line description so it's easy to spot later.</p>
+          </div>
+
+          <div class="card">
+            <h3>2. Move tasks through stages</h3>
+            <p class="muted mb-0">Every task starts as an <strong>Idea</strong>, becomes <strong>In Progress</strong>, waits in <strong>Review</strong>, then lands in <strong>Done</strong>. Seeing the pile shift from left to right is what makes progress feel real.</p>
+          </div>
+
+          <div class="card">
+            <h3>3. Add dates only where they matter</h3>
+            <p class="muted mb-0">Due dates are optional on purpose. Add one and the task starts warning you as the day approaches, then flags itself as overdue. Leave it blank and it stays quiet.</p>
+          </div>
+
+          <div class="card">
+            <h3>4. Keep your small tools nearby</h3>
+            <p class="muted mb-0">Quick notes, a word counter, a focus timer, colour palettes and a checklist all live on one page — so you stop hunting for five different websites mid-task.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Why it works without an account</h2>
+        <div class="prose">
+          <p>Most planning tools ask you to sign up, then keep your work on someone else's computer. This one doesn't. Your projects, tasks and notes are written straight into your own browser's storage, on the device you're using right now.</p>
+          <p>That trade-off buys you three things:</p>
+          <ul>
+            <li><strong>Privacy by default.</strong> There is no account, no tracking of your content, and no server holding your work. It cannot be read by anyone else because it never leaves your machine.</li>
+            <li><strong>It's genuinely instant.</strong> Nothing waits on a network. Every change is saved the moment you make it.</li>
+            <li><strong>It costs nothing to run.</strong> No servers means no subscription, now or later.</li>
+          </ul>
+          <p>The honest downside: your work lives on <em>this</em> device in <em>this</em> browser. It won't appear on your phone, and clearing your browsing data will erase it. That's exactly why the <strong>Save a backup</strong> button above exists — it hands you a single file holding everything, which you can restore here at any time, or on any other device.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/store.js"></script>
+  <script src="assets/js/core/ui.js"></script>
+  <script src="assets/js/core/nav.js"></script>
+  <script src="assets/js/core/app.js"></script>
+  <script src="assets/js/pages/dashboard.js"></script>
+</body>
+</html>

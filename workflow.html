@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflow</title>
+  <meta name="description" content="Organise your creative projects into stages, track every task and see what needs attention. Free, private and saved on your own device.">
+  <meta name="theme-color" content="#0b0d17">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-page="workflow" data-title="Workflow">
+
+  <div id="site-header"></div>
+
+  <main>
+    <div class="wrap">
+
+      <div class="page-head">
+        <div class="page-head__text">
+          <h1>Workflow</h1>
+          <p>Break your work into projects, then move each task from idea to done. Everything saves the moment you change it.</p>
+        </div>
+      </div>
+
+      <!-- Project switcher -->
+      <div id="projectBar" class="section"></div>
+
+      <!-- Add task + search + filters -->
+      <div id="taskPanel" class="section"></div>
+
+      <!-- The board -->
+      <div id="board" class="section"></div>
+
+      <!-- Project management -->
+      <div class="section">
+        <h2>Projects</h2>
+        <div id="projectPanel" class="grid grid--halves"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/store.js"></script>
+  <script src="assets/js/core/ui.js"></script>
+  <script src="assets/js/core/nav.js"></script>
+  <script src="assets/js/core/app.js"></script>
+  <script src="assets/js/pages/workflow.js"></script>
+</body>
+</html>
