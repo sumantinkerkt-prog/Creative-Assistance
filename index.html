@@ -3914,7 +3914,7 @@ var App = function App() {
     onUpdate: setBookmarksData,
     showToast: showToast
   })))), toastMsg && /*#__PURE__*/React.createElement("div", {
-    className: "fixed bottom-6 right-6 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] z-[100] text-sm font-medium toast-animate flex items-center space-x-3 border border-slate-700"
+    className: "fixed bottom-24 right-6 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] z-[100] text-sm font-medium toast-animate flex items-center space-x-3 border border-slate-700"
   }, /*#__PURE__*/React.createElement("div", {
     className: "w-2 h-2 rounded-full shrink-0 ".concat(toastMsg.type === 'success' ? 'bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]' : 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]')
   }), /*#__PURE__*/React.createElement("span", null, toastMsg.text || toastMsg)));
@@ -5909,15 +5909,15 @@ root.render(/*#__PURE__*/React.createElement(App, null));
                             {/* SECTION 3: ESSENTIAL TOOLS */}
                             <div className="mb-8">
                                 <h3 className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Essential Tools</h3>
-                                <button onClick={() => { window.location.href = 'essential tools with nav.html#analyzer'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                <button onClick={() => { window.location.href = 'image-analyzer.html#analyzer'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
                                     <div className="flex items-center space-x-3"><Icons.Search /><span>Analyzer</span></div>
                                     <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘3</span>
                                 </button>
-                                <button onClick={() => { window.location.href = 'text studio.html'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                <button onClick={() => { window.location.href = 'text-studio.html'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
                                     <div className="flex items-center space-x-3"><Icons.AlignLeft /><span>Text Studio</span></div>
                                     <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘4</span>
                                 </button>
-                                <button onClick={() => { window.location.href = 'compress and upscale.html'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                <button onClick={() => { window.location.href = 'compress-and-upscale.html'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
                                     <div className="flex items-center space-x-3"><Icons.Image /><span>Compress and Upscale</span></div>
                                     <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘5</span>
                                 </button>
@@ -5966,7 +5966,7 @@ root.render(/*#__PURE__*/React.createElement(App, null));
                     </main>
 
                     {toastMsg && (
-                        <div className="fixed bottom-6 right-6 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] z-[100] text-sm font-medium toast-animate flex items-center space-x-3 border border-slate-700">
+                        <div className="fixed bottom-24 right-6 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] z-[100] text-sm font-medium toast-animate flex items-center space-x-3 border border-slate-700">
                             <div className={`w-2 h-2 rounded-full shrink-0 ${toastMsg.type === 'success' ? 'bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]' : 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]'}`}></div>
                             <span>{toastMsg.text || toastMsg}</span>
                         </div>
@@ -5978,5 +5978,8 @@ root.render(/*#__PURE__*/React.createElement(App, null));
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
+
+    <!-- Shared page switcher (all pages) -->
+    <script src="switcher.js"></script>
 
 </body></html>
