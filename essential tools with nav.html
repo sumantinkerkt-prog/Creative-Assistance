@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Essential Tools - With Navigation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body, html {
             margin: 0;
@@ -11,11 +12,31 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            background: #0B101E;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
-        #mainFrame {
+        #content {
             width: 100%;
             height: 100%;
-            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #e2e8f0;
+        }
+        #content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #content p {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin: 0;
         }
         #navBtn {
             position: fixed;
@@ -55,12 +76,15 @@
         Back to Projects
     </button>
 
-    <!-- Main Content iframe -->
-    <iframe id="mainFrame" src="file:///D:/W/code/flow/essential%20tools.html"></iframe>
+    <!-- Main Content -->
+    <div id="content">
+        <h1>Essential Tools</h1>
+        <p>Coming Soon</p>
+    </div>
 
     <script>
         function navigateToProjects() {
-            window.location.href = 'file:///D:/W/code/flow/Upsworth%20Workflow%20with%20Nav.html';
+            window.location.href = 'index.html';
         }
     </script>
 </body>
