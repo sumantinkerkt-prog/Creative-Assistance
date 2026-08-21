@@ -446,6 +446,15 @@
         if (navMap[viewId]) document.getElementById(navMap[viewId]).classList.add('active');
     }
 
+    // ===== HASH-BASED NAVIGATION ON PAGE LOAD =====
+    (function() {
+        const hash = window.location.hash.replace('#', '');
+        const hashMap = { 'analyzer': 'app-analyzer', 'text': 'app-text', 'media': 'app-media' };
+        if (hash && hashMap[hash]) {
+            switchView(hashMap[hash]);
+        }
+    })();
+
     // ===== APP 1: ASPECT RATIO ANALYZER =====
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');

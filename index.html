@@ -4,12 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upsworth Workflow</title>
     
-    <script>
-        function navigateToEssentialTools() {
-            window.location.href = 'essential tools with nav.html';
-        }
-    </script>
-    
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -5910,9 +5904,22 @@ root.render(/*#__PURE__*/React.createElement(App, null));
                                 <h3 className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Workspace</h3>
                                 <NavItem id="projects" icon={Icons.Briefcase} label="Projects" shortcut="1" />
                                 <NavItem id="tasks" icon={Icons.CheckSquare} label="All Tasks" shortcut="2" />
-                                <button onClick={() => { window.location.href = 'essential tools with nav.html'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
-                                    <div className="flex items-center space-x-3"><Icons.Wrench /><span>Essential Tools</span></div>
+                            </div>
+
+                            {/* SECTION 3: ESSENTIAL TOOLS */}
+                            <div className="mb-8">
+                                <h3 className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Essential Tools</h3>
+                                <button onClick={() => { window.location.href = 'essential tools with nav.html#analyzer'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                    <div className="flex items-center space-x-3"><Icons.Search /><span>Analyzer</span></div>
                                     <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘3</span>
+                                </button>
+                                <button onClick={() => { window.location.href = 'essential tools with nav.html#text'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                    <div className="flex items-center space-x-3"><Icons.AlignLeft /><span>Text Studio</span></div>
+                                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘4</span>
+                                </button>
+                                <button onClick={() => { window.location.href = 'essential tools with nav.html#media'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                    <div className="flex items-center space-x-3"><Icons.Image /><span>Media Ops</span></div>
+                                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘5</span>
                                 </button>
                             </div>
                         </div>
