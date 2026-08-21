@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Compress and Upscale with Anjit</title>
+<title>Compress and Upscale - Creative Assistance</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <!-- Required Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -260,7 +260,7 @@ html,body{min-height:100vh;background:var(--bg);font-family:'Poppins',sans-serif
     <div class="hero-pill"><i class="ti ti-sparkles"></i> Premium Image &amp; PDF Tool</div>
     <h1>
       <span class="h1-line1">Compress &amp; Upscale</span>
-      <span class="h1-line2">with Anjit<span class="h1-dot">.</span></span>
+      <span class="h1-line2">Creative Assistance<span class="h1-dot">.</span></span>
     </h1>
     <p class="hero-sub">Compress or upscale images and PDFs. Bulk process, download as ZIP.</p>
   </div>
@@ -370,9 +370,8 @@ html,body{min-height:100vh;background:var(--bg);font-family:'Poppins',sans-serif
   <div class="footer">
     <div class="fnote"><i class="ti ti-lock-filled"></i>100% on-device — files never leave your browser</div>
     <div class="cbar">
-      <div class="cav">A</div>
-      <div><div class="cn">Anjit</div><div class="cr">Prepared &amp; designed by</div></div>
-      <div class="cbadge"><i class="ti ti-star-filled"></i>Creator</div>
+      <div class="cav">CA</div>
+      <div><div class="cn">Creative Assistance</div><div class="cr">Your creative toolkit</div></div>
     </div>
   </div>
 </div>
@@ -791,7 +790,7 @@ async function dlZip(){
   const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:1}});
   pb('bpb',100);setTimeout(()=>pbH('bpb'),700);
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=(MODE==='compress'?'compressed':'upscaled_'+SCALE+'x')+'_Anjit.zip';
+  a.download=(MODE==='compress'?'compressed':'upscaled_'+SCALE+'x')+'_Creative_Assistance.zip';
   a.click();
   g('bmsg').innerHTML=`<span class="sc ok"><i class="ti ti-circle-check"></i> ZIP downloaded!</span>`;
   g('bZipBtn').disabled=false;
