@@ -4,12 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upsworth Workflow</title>
     
-    <script>
-        function navigateToEssentialTools() {
-            window.location.href = 'essential tools with nav.html';
-        }
-    </script>
-    
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -3967,7 +3961,8 @@ root.render(/*#__PURE__*/React.createElement(App, null));
             CloudSync: () => <svg width="16" height="16" viewBox="0 0 24 24" {...IconProps}><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><path d="M8 16h8"/><path d="m12 12 4 4-4 4"/></svg>,
             GripVertical: () => <svg width="14" height="14" viewBox="0 0 24 24" {...IconProps}><circle cx="9" cy="12" r="1.5"/><circle cx="9" cy="5" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>,
             Move: () => <svg width="14" height="14" viewBox="0 0 24 24" {...IconProps}><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>,
-            MoreVertical: () => <svg width="14" height="14" viewBox="0 0 24 24" {...IconProps}><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            MoreVertical: () => <svg width="14" height="14" viewBox="0 0 24 24" {...IconProps}><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>,
+            Wrench: () => <svg width="16" height="16" viewBox="0 0 24 24" {...IconProps}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
         };
 
         const PRIORITIES = {
@@ -5909,6 +5904,23 @@ root.render(/*#__PURE__*/React.createElement(App, null));
                                 <h3 className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Workspace</h3>
                                 <NavItem id="projects" icon={Icons.Briefcase} label="Projects" shortcut="1" />
                                 <NavItem id="tasks" icon={Icons.CheckSquare} label="All Tasks" shortcut="2" />
+                            </div>
+
+                            {/* SECTION 3: ESSENTIAL TOOLS */}
+                            <div className="mb-8">
+                                <h3 className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Essential Tools</h3>
+                                <button onClick={() => { window.location.href = 'essential tools with nav.html#analyzer'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                    <div className="flex items-center space-x-3"><Icons.Search /><span>Analyzer</span></div>
+                                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘3</span>
+                                </button>
+                                <button onClick={() => { window.location.href = 'essential tools with nav.html#text'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                    <div className="flex items-center space-x-3"><Icons.AlignLeft /><span>Text Studio</span></div>
+                                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘4</span>
+                                </button>
+                                <button onClick={() => { window.location.href = 'essential tools with nav.html#media'; }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-200 premium-active mb-1.5 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 font-medium border border-transparent`}>
+                                    <div className="flex items-center space-x-3"><Icons.Image /><span>Media Ops</span></div>
+                                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-[#131B2C] text-slate-500`}>⌘5</span>
+                                </button>
                             </div>
                         </div>
 
