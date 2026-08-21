@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Assistance — Plan projects, track tasks, stay creative</title>
+  <meta name="description" content="A free, private workspace for creative work. Plan projects, track tasks on a simple board and use handy everyday tools. Everything is saved in your own browser.">
+  <meta name="theme-color" content="#6366f1">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+  <header class="site-head" data-site-head></header>
+
+  <main class="wrap">
+
+    <div class="page-head">
+      <span class="eyebrow">Your workspace</span>
+      <h1>Welcome back</h1>
+      <p>Plan projects, move tasks through to done, and reach for a handy tool when you need one.
+         Nothing here is uploaded anywhere — it all stays in this browser, on this device.</p>
+    </div>
+
+    <div class="stack-l">
+
+      <!-- At a glance -->
+      <section aria-labelledby="glanceHeading">
+        <h2 id="glanceHeading" class="sr-only">At a glance</h2>
+        <div class="grid grid-4" id="statGrid"></div>
+      </section>
+
+      <!-- Where to go -->
+      <section aria-labelledby="sectionsHeading">
+        <div class="card-head">
+          <h2 id="sectionsHeading">Jump in</h2>
+        </div>
+        <div class="grid grid-2">
+
+          <a class="card link-card" href="workflow.html">
+            <span class="icon icon-brand" aria-hidden="true">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="13" rx="1.5"></rect>
+                <path d="M6.5 16v5M17.5 20v1"></path>
+              </svg>
+            </span>
+            <h3>Workflow</h3>
+            <p>Set up your projects and move their tasks across Ideas, In&nbsp;Progress, Review and Done.</p>
+            <span class="more">Open the board →</span>
+          </a>
+
+          <a class="card link-card" href="essential-tools.html">
+            <span class="icon icon-tools" aria-hidden="true">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8z"></path>
+                <path d="M6 6l3 3"></path>
+              </svg>
+            </span>
+            <h3>Essential Tools</h3>
+            <p>Quick Notes, Word Counter, Focus Timer, Colour Palette and a Checklist — all in one place.</p>
+            <span class="more">Open the tools →</span>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- Coming up + projects -->
+      <section class="grid grid-2" aria-label="Your current work">
+
+        <div class="card">
+          <div class="card-head">
+            <h2>Coming up</h2>
+            <a class="small" href="workflow.html">All tasks</a>
+          </div>
+          <div id="upcoming"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>Projects</h2>
+            <a class="small" href="workflow.html">Manage</a>
+          </div>
+          <div id="projectList"></div>
+        </div>
+
+      </section>
+
+      <!-- Backup -->
+      <section class="card" aria-labelledby="backupHeading">
+        <div class="card-head">
+          <div>
+            <h2 id="backupHeading">Backup &amp; restore</h2>
+            <p class="card-sub">Your work lives in this browser only. Save a copy before clearing your
+              browsing data, or to move it to another device.</p>
+          </div>
+        </div>
+        <div class="row">
+          <button class="btn btn-primary" type="button" id="exportBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12M7 10l5 5 5-5M4 21h16"></path>
+            </svg>
+            Save a backup
+          </button>
+          <button class="btn" type="button" id="importBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 15V3M7 8l5-5 5 5M4 21h16"></path>
+            </svg>
+            Restore from a file
+          </button>
+          <button class="btn btn-danger" type="button" id="resetBtn">Clear everything</button>
+          <input type="file" id="importFile" accept="application/json,.json" class="sr-only" aria-label="Choose a backup file">
+        </div>
+        <p class="small muted" id="storageNote" style="margin-top:12px"></p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-foot" data-site-foot></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/home.js"></script>
+</body>
+</html>
