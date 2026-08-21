@@ -1,921 +1,772 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative Assistance | All-in-One Studio</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,700;1,800&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    
-    <!-- Required Libraries for Media Optimizer -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+    <title>Minimal Aspect Ratio Detector</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        poppins: ['"Poppins"', 'sans-serif'],
-                    },
                     colors: {
-                        dark: '#050507',
-                        card: '#0a0a0c',
-                        accent: '#06b6d4',
-                        studio: { bg: '#050505', card: '#0a0a0c', border: '#1f1f22' }
-                    },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                        'float': 'float 3s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        glow: {
-                            '0%': { boxShadow: '0 0 10px rgba(6, 182, 212, 0.2)' },
-                            '100%': { boxShadow: '0 0 25px rgba(6, 182, 212, 0.6)' }
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-5px)' },
-                        }
+                        darkbg: '#090d16',
+                        darkcard: '#111827',
+                        darkborder: '#1f293d'
                     }
                 }
             }
         }
     </script>
-
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { background-color: #050507; color: #ececf1; min-height: 100vh; overflow-x: hidden; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #2a2a30; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4a4a50; }
-
-        .bg-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-        .bg-mesh { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(124,111,255,0.09) 0%, transparent 60%), radial-gradient(ellipse 50% 35% at 15% 85%, rgba(16,217,160,0.06) 0%, transparent 55%), radial-gradient(ellipse 40% 50% at 50% 50%, rgba(90,82,224,0.04) 0%, transparent 70%); }
-        .bg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(circle at center, black, transparent 80%); -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%); }
-        .orb { position: absolute; border-radius: 50%; filter: blur(60px); animation: orbFloat 8s ease-in-out infinite; }
-        .orb1 { width: 320px; height: 320px; top: -100px; right: -80px; background: rgba(99, 102, 241, 0.12); animation-delay: 0s; }
-        .orb2 { width: 240px; height: 240px; bottom: -80px; left: -60px; background: rgba(6, 182, 212, 0.08); animation-delay: -3s; }
-        @keyframes orbFloat { 0%, 100% { transform: translateY(0) scale(1) } 50% { transform: translateY(-30px) scale(1.05) } }
-
-        .app-view { display: none; opacity: 0; transition: opacity 0.4s ease-in-out; position: relative; z-index: 10; width: 100%; max-width: 1280px; margin: 0 auto; padding-top: 220px;}
-        .app-view.active { display: block; opacity: 1; animation: fadeInUp 0.5s ease-out forwards; }
-
-        .glass-nav { background: rgba(15, 15, 20, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
-        .nav-btn { position: relative; transition: all 0.3s ease; }
-        .nav-btn.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-        .nav-btn.active::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: #6366f1; border-radius: 4px; box-shadow: 0 0 10px #6366f1; }
-
-        .analyzer-glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .drop-zone-active { border-color: #06b6d4 !important; background: rgba(6, 182, 212, 0.1) !important; transform: scale(1.02); }
-        .image-card:hover .delete-btn { opacity: 1; transform: scale(1); }
-
-        .editor-container { background: linear-gradient(180deg, #111114 0%, #0a0a0c 100%); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.02) inset; }
-        .editor-top-glow { position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.8), transparent); opacity: 0.5; }
-        .action-btn { background: #111114; border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
-        .action-btn:hover { border-color: rgba(255, 255, 255, 0.2); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); color: #fff; }
-        .action-btn:active { transform: translateY(1px) scale(0.96); }
-        textarea:focus + .focus-ring { opacity: 1; }
-        .flash-success { animation: textSuccess 0.4s ease-out; }
-        @keyframes textSuccess { 0% { color: #fff; text-shadow: 0 0 15px rgba(99, 102, 241, 0.8); transform: scale(0.998); } 50% { transform: scale(1); } 100% { color: #ececf1; text-shadow: none; } }
-
-        .media-app {
-            --bg:transparent; --s1:#0b0f1a; --s2:#101627; --s3:#151d30; --s4:#1c2640; --b1:#1e2a40; --b2:#253148; --b3:#2e3c58;
-            --t1:#eef2ff; --t2:#a8b4d0; --t3:#6878a0; --t4:#3d4f70;
-            --v:#7c6fff; --v2:#9d96ff; --v3:#5a52e0; --vg:rgba(124,111,255,0.15); --vb:rgba(124,111,255,0.3);
-            --g:#10d9a0; --g2:#00f5b8; --gb:rgba(16,217,160,0.2); --gg:rgba(16,217,160,0.08);
-            --y:#f5a623; --r:#f43f5e;
-            --rad:16px; --rad-s:10px; --rad-xs:6px;
-            font-family: 'Poppins', sans-serif;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #090d16;
+            color: #f3f4f6;
         }
-        .media-app .shell{ display:flex;flex-direction:column; width:100%;}
-        .media-app .top-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:1.4rem;flex-wrap:wrap;}
-        .media-app .seg-grp{display:flex;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rad-s);padding:3px;gap:2px}
-        .media-app .seg{padding:7px 18px;font-size:12px;font-weight:600;border-radius:8px;border:none;cursor:pointer;background:transparent;color:var(--t3);font-family:'Poppins',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px;letter-spacing:.01em;white-space:nowrap}
-        .media-app .seg.on{background:linear-gradient(135deg,var(--v3),var(--v));color:#fff;box-shadow:0 3px 12px rgba(124,111,255,.4)}
-        .media-app .pill-count{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--vb);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--v2);font-weight:600}
-        .media-app .panel{background:rgba(11, 15, 26, 0.7); backdrop-filter: blur(12px); border-radius:20px;border:1px solid var(--b1);flex:1;display:flex;flex-direction:column;padding:1.4rem;gap:14px;box-shadow:0 0 80px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.02) inset;}
-        .media-app .dz{border:1.5px dashed var(--b2);border-radius:var(--rad);cursor:pointer;transition:all .25s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1rem;text-align:center;min-height:210px;background:linear-gradient(135deg,rgba(16,22,39,0.8),rgba(21,29,48,0.8));position:relative;overflow:hidden}
-        .media-app .dz:hover,.media-app .dz.ov{border-color:var(--v);background:linear-gradient(135deg,var(--s3),var(--s4));box-shadow:0 0 0 1px rgba(124,111,255,.2) inset,0 0 40px rgba(124,111,255,.06)}
-        .media-app .dz-icon-wrap{width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,rgba(124,111,255,.18),rgba(124,111,255,.06));border:1px solid var(--vb);display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:28px;color:var(--v2);box-shadow:0 8px 24px rgba(124,111,255,.2),0 0 0 6px rgba(124,111,255,.06);transition:all .25s;}
-        .media-app .dz-title{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:7px;}
-        .media-app .dz-sub{font-size:12px;color:var(--t3);margin-bottom:18px;line-height:1.6;}
-        .media-app .dz-chips{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;}
-        .media-app .ch{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--s1);color:var(--t3);border:1px solid var(--b1);letter-spacing:.04em}
-        .media-app .ch.v{color:var(--v2);border-color:var(--vb);background:var(--vg)}
-        .media-app .ch.g{color:var(--g);border-color:var(--gb);background:var(--gg)}
-        .media-app .ch.r{color:#f43f5e;border-color:rgba(244,63,94,0.3);background:rgba(244,63,94,0.1)}
-        .media-app .ca{flex:1;display:none;flex-direction:column;gap:14px;}
-        .media-app .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-        .media-app .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-        .media-app .pc{background:var(--s2);border-radius:var(--rad);border:1px solid var(--b1);padding:12px;transition:border-color .3s}
-        .media-app .pc.lit{border-color:var(--vb)}
-        .media-app .pc-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-        .media-app .pc-dot{width:5px;height:5px;border-radius:50%}
-        .media-app .pimgw{width:100%;aspect-ratio:16/9;border-radius:8px;background:var(--s3);border:1px solid var(--b1);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
-        .media-app .pimgw img{width:100%;height:100%;object-fit:contain;transition:opacity .3s}
-        .media-app .ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--b3)}
-        .media-app .pmeta{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
-        .media-app .ptag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--s3);color:var(--t3);border:1px solid var(--b1)}
-        .media-app .ptag.ok{background:var(--gg);color:var(--g);border-color:var(--gb)}
-        .media-app .pdim{font-size:10px;color:var(--t4)}
-        .media-app .st{background:var(--s2);border-radius:var(--rad-s);padding:12px 14px;border:1px solid var(--b1);position:relative;overflow:hidden;transition:all .3s}
-        .media-app .st.lit{border-color:var(--b2)}
-        .media-app .sl{font-size:9px;font-weight:700;color:var(--t4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em}
-        .media-app .sv{font-size:18px;font-weight:800;color:var(--t1)}
-        .media-app .sv.g{color:var(--g)}
-        .media-app .qw{background:var(--s2);border-radius:var(--rad-s);padding:12px 14px;border:1px solid var(--b1)}
-        .media-app .qw-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-        .media-app .qw-lbl{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t4)}
-        .media-app .qw-val{font-size:12px;font-weight:700;color:var(--t2)}
-        .media-app .qbars{display:flex;align-items:flex-end;gap:3px;height:24px}
-        .media-app .qb{border-radius:3px;background:var(--s4);transition:all .4s;flex:1}
-        .media-app .qb:nth-child(1){height:15%}.media-app .qb:nth-child(2){height:24%}.media-app .qb:nth-child(3){height:33%}.media-app .qb:nth-child(4){height:43%}
-        .media-app .qb:nth-child(5){height:52%}.media-app .qb:nth-child(6){height:62%}.media-app .qb:nth-child(7){height:72%}.media-app .qb:nth-child(8){height:82%}
-        .media-app .qb:nth-child(9){height:91%}.media-app .qb:nth-child(10){height:100%}
-        .media-app .qb.lg{background:linear-gradient(0deg,var(--g),rgba(16,217,160,.5))}
-        .media-app .qb.ly{background:linear-gradient(0deg,var(--y),rgba(245,166,35,.5))}
-        .media-app .qb.lr{background:linear-gradient(0deg,var(--r),rgba(244,63,94,.5))}
-        .media-app .ctrl{background:var(--s2);border-radius:var(--rad);border:1px solid var(--b1);padding:1.2rem}
-        .media-app .ctrl-hdr{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-        .media-app .crow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-        .media-app .clbl{font-size:11px;color:var(--t3);min-width:82px;font-weight:500}
-        .media-app .rng{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--s4);outline:none;cursor:pointer}
-        .media-app .rng::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--v2));cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 0 3px rgba(124,111,255,.2)}
-        .media-app .num{width:66px;padding:5px 7px;font-size:12px;font-weight:700;text-align:center;background:var(--s3);border:1px solid var(--b1);border-radius:var(--rad-xs);color:var(--t1);outline:none;}
-        .media-app .ku{font-size:10px;color:var(--t4)}
-        .media-app .psbs, .media-app .fbs, .media-app .sbs {display:flex;gap:4px;flex-wrap:wrap}
-        .media-app .psb, .media-app .fb, .media-app .sb {font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid var(--b1);background:var(--s3);color:var(--t3);cursor:pointer;transition:all .15s;}
-        .media-app .psb.on, .media-app .fb.on, .media-app .sb.on {border-color:var(--vb);color:var(--v2);background:var(--vg)}
-        .media-app .hint{font-size:10px;color:var(--t4);margin-top:7px;line-height:1.65;padding:8px 10px;background:var(--s3);border-radius:var(--rad-xs);border:1px solid var(--b1)}
-        .media-app .acts{display:flex;gap:8px;margin-bottom:8px}
-        .media-app .btn-run, .media-app .btn-dl, .media-app .btn-zip {flex:1;padding:13px 0;border-radius:var(--rad-s);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
-        .media-app .btn-run {border:1px solid var(--b2);background:linear-gradient(135deg,var(--s3),var(--s4));color:var(--t1);}
-        .media-app .btn-dl {border:1px solid var(--vb);background:linear-gradient(135deg,rgba(124,111,255,.2),rgba(124,111,255,.08));color:var(--v2);}
-        .media-app .btn-zip {border:1px solid var(--gb);background:linear-gradient(135deg,var(--gg),rgba(16,217,160,.03));color:var(--g);}
-        .media-app .btn-run:disabled, .media-app .btn-dl:disabled, .media-app .btn-zip:disabled {opacity:.3;cursor:not-allowed}
-        .media-app .pbw{height:2px;background:var(--s4);border-radius:1px;overflow:hidden;display:none;margin-bottom:8px}
-        .media-app .pbf{height:100%;width:0%;border-radius:1px;background:linear-gradient(90deg,var(--v3),var(--v2),var(--g));transition:width .3s;}
-        .media-app .str{display:flex;align-items:center;justify-content:space-between;min-height:24px}
-        .media-app .sc{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--b1);background:var(--s2);color:var(--t3)}
-        .media-app .sc.ok{background:var(--gg);color:var(--g);border-color:var(--gb)}
-        .media-app .rlnk{font-size:11px;color:var(--t4);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px;display:flex;align-items:center;gap:4px;}
-        .media-app .bl-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-        .media-app .flist{display:flex;flex-direction:column;gap:4px;max-height:230px;overflow-y:auto;padding-right:3px}
-        .media-app .frow{display:grid;grid-template-columns:28px 1fr 62px 62px 86px 20px;align-items:center;gap:6px;background:var(--s2);border-radius:8px;padding:6px 8px;border:1px solid var(--b1);}
-        .media-app .fthumb{width:26px;height:26px;border-radius:5px;object-fit:cover;background:var(--s3)}
-        .media-app .fname{font-size:11px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .media-app .forig, .media-app .fout{font-size:10px;text-align:right;color:var(--t4)}
-        .media-app .fst{display:flex;align-items:center;justify-content:flex-end}
-        .media-app .fdel{background:none;border:none;cursor:pointer;color:var(--t4);font-size:13px;display:flex;align-items:center;width:18px;height:18px;border-radius:3px;padding:0;justify-content:center}
-        .media-app .dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:3px}
-        .media-app .dw{background:var(--t4)}.media-app .dd{background:var(--g)}
-        .media-app .blk-st{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-        @media (max-width: 768px) { .media-app .g2, .media-app .blk-st{grid-template-columns: 1fr;} .media-app .frow { grid-template-columns: 28px 1fr 40px 40px 20px; } }
+
+        .glass-card {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .ratio-chip {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ratio-chip:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Tooltip styling with smart positioning */
+        .hover-popover {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .has-popover:hover .hover-popover {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
     </style>
 </head>
-<body class="antialiased selection:bg-indigo-500/40 selection:text-white">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 antialiased">
 
-    <!-- Global Background Elements -->
-    <div class="bg-wrap">
-        <div class="bg-grid"></div>
-        <div class="bg-mesh"></div>
-        <div class="orb orb1"></div>
-        <div class="orb orb2"></div>
-    </div>
+    <div class="w-full max-w-4xl flex flex-col gap-4">
 
-    <!-- Floating Top Navigation -->
-    <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-2xl flex flex-col items-center gap-4">
-        
-        <!-- Premium Brand Title -->
-        <h1 class="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-r from-[#32d4f9] to-[#7ae582] drop-shadow-lg text-center mt-2 pb-2">
-            Creative Assistance
-        </h1>
-
-        <!-- Spacious Navigation Bar -->
-        <nav class="glass-nav rounded-full px-6 py-2 md:py-3 flex justify-between items-center w-full">
-            <button onclick="switchView('app-analyzer')" id="nav-analyzer" class="nav-btn active flex-1 pb-4 pt-2 text-sm font-semibold text-slate-400 hover:text-white flex flex-col items-center gap-2">
-                <i class="ph-fill ph-scan text-2xl"></i><span class="text-[11px] uppercase tracking-wider hidden sm:block">Analyzer</span>
-            </button>
-            <div class="w-px h-10 bg-white/10"></div>
-            <button onclick="switchView('app-text')" id="nav-text" class="nav-btn flex-1 pb-4 pt-2 text-sm font-semibold text-slate-400 hover:text-white flex flex-col items-center gap-2">
-                <i class="ph-fill ph-text-t text-2xl"></i><span class="text-[11px] uppercase tracking-wider hidden sm:block">Text Studio</span>
-            </button>
-            <div class="w-px h-10 bg-white/10"></div>
-            <button onclick="switchView('app-media')" id="nav-media" class="nav-btn flex-1 pb-4 pt-2 text-sm font-semibold text-slate-400 hover:text-white flex flex-col items-center gap-2">
-                <i class="ph-fill ph-aperture text-2xl"></i><span class="text-[11px] uppercase tracking-wider hidden sm:block">Media Ops</span>
-            </button>
-            <div class="w-px h-10 bg-white/10"></div>
-            <button onclick="window.location.href='index.html'" class="nav-btn flex-1 pb-4 pt-2 text-sm font-semibold text-slate-400 hover:text-white flex flex-col items-center gap-2">
-                <i class="ph-fill ph-arrow-left text-2xl"></i><span class="text-[11px] uppercase tracking-wider hidden sm:block">Projects</span>
-            </button>
-        </nav>
-    </div>
-
-    <!-- ==================== APP 1: ASPECT RATIO ANALYZER ==================== -->
-    <div id="app-analyzer" class="app-view active">
-        <div class="max-w-5xl mx-auto px-4 pb-20">
-            <!-- Drop Zone -->
-            <div id="drop-zone" class="border-2 border-dashed border-slate-700/50 rounded-2xl p-10 text-center transition-all duration-300 cursor-pointer hover:border-cyan-500/50 hover:bg-cyan-500/5 mb-8 analyzer-glass">
-                <div class="animate-float">
-                    <i class="ph-fill ph-cloud-arrow-up text-5xl text-cyan-400/80 mb-4 block"></i>
+        <!-- Top Header & Inputs Bar -->
+        <header class="glass-card p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+            <!-- App Title -->
+            <div class="flex items-center gap-3 self-start sm:self-auto">
+                <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-crop-simple"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">Drop Images Here</h3>
-                <p class="text-slate-400 text-sm mb-4">or click to browse files</p>
-                <div class="flex justify-center gap-2 flex-wrap">
-                    <span class="px-3 py-1 rounded-full bg-slate-800/80 text-xs text-slate-400 border border-slate-700/50">JPG</span>
-                    <span class="px-3 py-1 rounded-full bg-slate-800/80 text-xs text-slate-400 border border-slate-700/50">PNG</span>
-                    <span class="px-3 py-1 rounded-full bg-slate-800/80 text-xs text-slate-400 border border-slate-700/50">WebP</span>
-                    <span class="px-3 py-1 rounded-full bg-slate-800/80 text-xs text-slate-400 border border-slate-700/50">GIF</span>
+                <div>
+                    <h1 class="font-bold text-base text-slate-100 leading-tight">Aspect Ratio Detector</h1>
+                    <p class="text-xs text-slate-400">Hover or click any ratio chip for details & AI model support</p>
                 </div>
-                <input type="file" id="file-input" multiple accept="image/*" class="hidden">
             </div>
 
-            <!-- Results Grid -->
-            <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </div>
-    </div>
+            <!-- Inputs Group -->
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <!-- Width Input -->
+                <div class="relative w-28 sm:w-32">
+                    <input type="number" id="imgWidth" value="1920" min="1" max="32000" 
+                           class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-3 pr-7 py-2 text-slate-100 font-mono text-xs font-semibold focus:outline-none focus:border-blue-500 transition">
+                    <span class="absolute right-2.5 top-2.5 text-[10px] font-mono text-slate-500">W</span>
+                </div>
 
-    <!-- ==================== APP 2: TEXT STUDIO ==================== -->
-    <div id="app-text" class="app-view">
-        <div class="max-w-4xl mx-auto px-4 pb-20">
-            <!-- Editor Container -->
-            <div class="editor-container rounded-2xl p-6 md:p-8 relative">
-                <div class="editor-top-glow"></div>
+                <span class="text-slate-500 text-xs font-bold">×</span>
+
+                <!-- Height Input -->
+                <div class="relative w-28 sm:w-32">
+                    <input type="number" id="imgHeight" value="1080" min="1" max="32000" 
+                           class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-3 pr-7 py-2 text-slate-100 font-mono text-xs font-semibold focus:outline-none focus:border-blue-500 transition">
+                    <span class="absolute right-2.5 top-2.5 text-[10px] font-mono text-slate-500">H</span>
+                </div>
+
+                <!-- Swap Button -->
+                <button id="swapBtn" title="Swap Width/Height" 
+                        class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition text-xs">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+
+                <!-- Upload Image Button -->
+                <button id="uploadBtn" title="Upload Image File" 
+                        class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl border border-blue-500 transition text-xs flex items-center gap-1.5 font-medium px-3 shadow-lg shadow-blue-600/20">
+                    <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                    <span class="hidden sm:inline">Upload Image</span>
+                </button>
+                <input type="file" id="imageInput" accept="image/*" class="hidden">
+
+                <!-- Complete Presets Dropdown -->
+                <select id="presetSelect" class="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-xl px-2.5 py-2 focus:outline-none focus:border-blue-500 transition">
+                    <option value="" disabled selected>Presets</option>
+                    <option value="1920x1080">16:9 1080p (1920×1080)</option>
+                    <option value="3840x2160">16:9 4K UHD (3840×2160)</option>
+                    <option value="1080x1080">1:1 Square (1080×1080)</option>
+                    <option value="1080x1350">4:5 IG Feed (1080×1350)</option>
+                    <option value="1080x1920">9:16 Reel/Story (1080×1920)</option>
+                    <option value="2000x1000">2:1 Univisium (2000×1000)</option>
+                    <option value="3000x1000">3:1 Super Wide (3000×1000)</option>
+                    <option value="4000x1000">4:1 Header (4000×1000)</option>
+                    <option value="8000x1000">8:1 Panorama (8000×1000)</option>
+                    <option value="2000x3000">2:3 Vertical (2000×3000)</option>
+                    <option value="3000x2000">3:2 DSLR (3000×2000)</option>
+                    <option value="3000x4000">3:4 Vertical (3000×4000)</option>
+                    <option value="4000x3000">4:3 Photo (4000×3000)</option>
+                    <option value="2500x2000">5:4 Format (2500×2000)</option>
+                    <option value="3440x1440">21:9 Ultrawide (3440×1440)</option>
+                    <option value="1000x4000">1:4 Vert. Banner (1000×4000)</option>
+                    <option value="1000x8000">1:8 Skyscraper (1000×8000)</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Main Interactive Visual Canvas -->
+        <main class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col gap-4 shadow-xl">
+            
+            <!-- Canvas Header / Status Bar -->
+            <div class="flex items-center justify-between text-xs">
+                <!-- Calculated Ratio Pill -->
+                <div class="flex items-center gap-2">
+                    <span class="text-slate-400">Calculated:</span>
+                    <span id="exactRatioBadge" class="bg-blue-950/80 text-blue-400 border border-blue-800/80 font-mono font-bold px-2.5 py-1 rounded-lg">
+                        16 : 9
+                    </span>
+                    <span id="decimalBadge" class="text-slate-500 font-mono text-[11px]">(1.778)</span>
+                </div>
+
+                <!-- Mode Toggle (Crop / Pad / Outline) -->
+                <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+                    <button id="modeCrop" class="view-mode-btn px-2.5 py-1 text-[11px] font-medium rounded-lg bg-blue-600 text-white transition">Crop</button>
+                    <button id="modePad" class="view-mode-btn px-2.5 py-1 text-[11px] font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">Pad</button>
+                    <button id="modeOutline" class="view-mode-btn px-2.5 py-1 text-[11px] font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">Outline</button>
+                </div>
+            </div>
+
+            <!-- SVG Visual Canvas Box -->
+            <div id="dropZone" class="relative w-full h-[260px] sm:h-[300px] bg-slate-950/80 rounded-xl border-2 border-dashed border-slate-800/80 hover:border-blue-500/50 flex items-center justify-center p-4 overflow-hidden select-none transition-all cursor-pointer group">
                 
-                <!-- Header -->
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center">
-                            <i class="ph-fill ph-text-t text-indigo-400 text-sm"></i>
-                        </div>
-                        <h2 class="text-lg font-bold text-white">Text Studio</h2>
+                <!-- Drop Hover Prompt Overlay -->
+                <div id="dropPrompt" class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-950/80 backdrop-blur-xs z-30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <div class="w-10 h-10 rounded-full bg-blue-600/30 text-blue-400 border border-blue-500/40 flex items-center justify-center text-lg shadow-lg">
+                        <i class="fa-solid fa-file-image"></i>
                     </div>
+                    <span class="text-xs font-semibold text-slate-100">Drop image here or click to browse</span>
+                    <span class="text-[10px] text-slate-400">Auto-detects width & height (JPG, PNG, WEBP, GIF, SVG)</span>
+                </div>
+
+                <!-- Active Image Info Badge -->
+                <div id="imageInfoBadge" class="hidden absolute top-3 left-3 bg-slate-900/95 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[11px] font-mono text-slate-200 backdrop-blur-sm flex items-center gap-2 z-20 shadow-xl">
+                    <i class="fa-regular fa-image text-blue-400"></i>
+                    <span id="imageFileNameText" class="truncate max-w-[130px] sm:max-w-[200px] font-semibold">photo.jpg</span>
+                    <span id="imageMetaText" class="text-slate-400 text-[10px]">(1920×1080)</span>
+                    <button id="clearImageBtn" class="text-slate-400 hover:text-red-400 ml-1 transition p-0.5" title="Remove Image">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- SVG Canvas -->
+                <svg id="visualSvg" class="w-full h-full max-w-full max-h-full transition-all duration-300" viewBox="0 0 600 360">
+                    <!-- Rendered via JS -->
+                </svg>
+
+                <!-- Active Target Ratio Floating Tag -->
+                <div class="absolute bottom-3 right-3 bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 text-[11px] font-mono text-slate-300 backdrop-blur-sm flex items-center gap-2 z-20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span id="activeRatioName">16:9 Widescreen</span>
+                </div>
+            </div>
+
+            <!-- Selected Ratio Detail Inspector Banner -->
+            <div id="selectedRatioDetailCard" class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-2">
-                        <span id="char-count" class="text-xs text-slate-500 font-mono">0 chars</span>
-                        <span class="text-slate-700">|</span>
-                        <span id="word-count" class="text-xs text-slate-500 font-mono">0 words</span>
+                        <span id="detailRatioTitle" class="font-bold text-slate-200 text-sm">16:9 Widescreen</span>
+                        <span id="detailMatchScore" class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-md font-mono text-[10px] font-bold">100% Match</span>
                     </div>
+                    <p id="detailDesc" class="text-slate-400 text-[11px]">HD Video, YouTube, TV & Monitors</p>
                 </div>
-
-                <!-- Textarea -->
-                <div class="relative mb-6">
-                    <textarea id="text-input" placeholder="Paste or type your text here..." class="w-full h-48 bg-black/30 rounded-xl border border-white/5 px-5 py-4 text-slate-200 text-[15px] leading-relaxed resize-none focus:outline-none focus:border-indigo-500/40 placeholder:text-slate-600 font-mono transition-colors"></textarea>
-                    <div class="focus-ring absolute inset-0 rounded-xl border border-indigo-500/30 pointer-events-none opacity-0 transition-opacity"></div>
-                </div>
-
-                <!-- Action Buttons Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    <button onclick="transformText('upper')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-text-aa text-base text-indigo-400/70"></i> UPPER
-                    </button>
-                    <button onclick="transformText('lower')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-text-aa text-base text-cyan-400/70"></i> lower
-                    </button>
-                    <button onclick="transformText('title')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-text-t text-base text-emerald-400/70"></i> Title Case
-                    </button>
-                    <button onclick="transformText('sentence')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-text-align-left text-base text-amber-400/70"></i> Sentence
-                    </button>
-                    <button onclick="transformText('camel')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-code text-base text-purple-400/70"></i> camelCase
-                    </button>
-                    <button onclick="transformText('snake')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-code text-base text-orange-400/70"></i> snake_case
-                    </button>
-                    <button onclick="transformText('kebab')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-minus text-base text-pink-400/70"></i> kebab-case
-                    </button>
-                    <button onclick="transformText('reverse')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-arrow-u-down-left text-base text-rose-400/70"></i> Reverse
-                    </button>
-                    <button onclick="transformText('trim')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-scissors text-base text-teal-400/70"></i> Trim
-                    </button>
-                    <button onclick="transformText('removeSpaces')" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2">
-                        <i class="ph ph-x text-base text-red-400/70"></i> No Spaces
-                    </button>
-                    <button onclick="copyText()" class="action-btn rounded-xl px-4 py-3 text-slate-400 text-xs font-semibold flex items-center gap-2 col-span-2 sm:col-span-1 md:col-span-2 justify-center bg-indigo-500/10 border-indigo-500/20">
-                        <i class="ph ph-copy text-base text-indigo-400"></i> Copy Result
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== APP 3: MEDIA COMPRESS & UPSCALE ==================== -->
-    <div id="app-media" class="app-view">
-        <div class="max-w-5xl mx-auto px-4 pb-20 media-app">
-            <div class="shell">
-                <!-- Mode Selector -->
-                <div class="top-bar">
-                    <div class="seg-grp">
-                        <button class="seg on" onclick="mediaSetMode('compress')"><i class="ti ti-photo-down"></i> Compress</button>
-                        <button class="seg" onclick="mediaSetMode('upscale')"><i class="ti ti-photo-up"></i> Upscale</button>
-                        <button class="seg" onclick="mediaSetMode('convert')"><i class="ti ti-transform"></i> Convert</button>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
+                    <div class="bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800/80 text-[11px] font-mono text-slate-300 w-full sm:w-auto">
+                        <span class="text-blue-400 font-semibold block text-[10px]">Crop Specs:</span>
+                        <span id="detailCropAdvice">Perfect Match! No crop or pad required.</span>
                     </div>
-                    <div class="pill-count"><i class="ti ti-files"></i> <span id="m-count">0</span> files</div>
-                </div>
-
-                <!-- Main Panel -->
-                <div class="panel">
-                    <!-- Drop Zone -->
-                    <div class="dz" id="m-dz">
-                        <div class="dz-icon-wrap"><i class="ti ti-cloud-upload"></i></div>
-                        <div class="dz-title">Drop files here</div>
-                        <div class="dz-sub">Images & PDFs supported. Up to 50MB per file.</div>
-                        <div class="dz-chips">
-                            <span class="ch v">JPG</span><span class="ch v">PNG</span><span class="ch v">WebP</span><span class="ch g">PDF</span><span class="ch">GIF</span><span class="ch">SVG</span>
-                        </div>
-                        <input type="file" id="m-fin" multiple accept="image/*,.pdf" hidden>
-                    </div>
-
-                    <!-- Content Area (shown after files added) -->
-                    <div class="ca" id="m-ca">
-                        <!-- Preview & Stats -->
-                        <div class="g2">
-                            <div class="pc" id="m-pc-orig">
-                                <div class="pc-lbl"><span class="pc-dot" style="background:var(--t3)"></span> ORIGINAL</div>
-                                <div class="pimgw" id="m-orig-wrap"><div class="ph"><i class="ti ti-photo" style="font-size:24px"></i><span style="font-size:10px">Original Preview</span></div></div>
-                                <div class="pmeta"><span class="ptag" id="m-orig-type">-</span><span class="pdim" id="m-orig-dim">-</span></div>
-                            </div>
-                            <div class="pc" id="m-pc-out">
-                                <div class="pc-lbl"><span class="pc-dot" style="background:var(--g)"></span> OUTPUT</div>
-                                <div class="pimgw" id="m-out-wrap"><div class="ph"><i class="ti ti-sparkles" style="font-size:24px"></i><span style="font-size:10px">Processed Preview</span></div></div>
-                                <div class="pmeta"><span class="ptag ok" id="m-out-type">-</span><span class="pdim" id="m-out-dim">-</span></div>
-                            </div>
-                        </div>
-
-                        <!-- Stats Row -->
-                        <div class="g3" id="m-stats">
-                            <div class="st"><div class="sl">Original Size</div><div class="sv" id="m-s-orig">-</div></div>
-                            <div class="st"><div class="sl">Output Size</div><div class="sv g" id="m-s-out">-</div></div>
-                            <div class="st"><div class="sl">Saved</div><div class="sv" id="m-s-saved" style="color:var(--v2)">-</div></div>
-                        </div>
-
-                        <!-- Quality Widget -->
-                        <div class="qw" id="m-qw">
-                            <div class="qw-top"><span class="qw-lbl">QUALITY LEVEL</span><span class="qw-val" id="m-qv">80%</span></div>
-                            <div class="qbars" id="m-qbars"></div>
-                        </div>
-
-                        <!-- Controls -->
-                        <div class="ctrl" id="m-ctrl">
-                            <div class="ctrl-hdr"><i class="ti ti-adjustments"></i> SETTINGS</div>
-                            
-                            <!-- Compress Controls -->
-                            <div id="m-ctrl-compress">
-                                <div class="crow"><span class="clbl">Quality</span><input type="range" class="rng" id="m-quality" min="10" max="100" value="80" oninput="mediaUpdateQuality(this.value)"><input type="number" class="num" id="m-quality-num" value="80" min="10" max="100" onchange="mediaUpdateQuality(this.value)"><span class="ku">%</span></div>
-                                <div class="crow"><span class="clbl">Max Width</span><input type="number" class="num" id="m-maxw" value="0" min="0" step="100" style="width:80px"><span class="ku">px (0=auto)</span></div>
-                                <div style="margin-top:8px"><div class="pc-lbl">FORMAT</div><div class="fbs" id="m-fmt-btns"><button class="fb on" data-f="auto">Auto</button><button class="fb" data-f="jpeg">JPEG</button><button class="fb" data-f="png">PNG</button><button class="fb" data-f="webp">WebP</button></div></div>
-                            </div>
-
-                            <!-- Upscale Controls -->
-                            <div id="m-ctrl-upscale" style="display:none">
-                                <div style="margin-bottom:8px"><div class="pc-lbl">SCALE FACTOR</div><div class="sbs" id="m-scale-btns"><button class="sb on" data-s="2">2x</button><button class="sb" data-s="3">3x</button><button class="sb" data-s="4">4x</button></div></div>
-                                <div class="hint"><i class="ti ti-info-circle"></i> Uses browser-based bicubic interpolation. For AI-quality upscaling, external APIs are needed.</div>
-                            </div>
-
-                            <!-- Convert Controls -->
-                            <div id="m-ctrl-convert" style="display:none">
-                                <div><div class="pc-lbl">TARGET FORMAT</div><div class="fbs" id="m-conv-btns"><button class="fb on" data-f="jpeg">JPEG</button><button class="fb" data-f="png">PNG</button><button class="fb" data-f="webp">WebP</button><button class="fb" data-f="pdf">PDF</button></div></div>
-                                <div class="crow" style="margin-top:10px"><span class="clbl">Quality</span><input type="range" class="rng" id="m-conv-q" min="10" max="100" value="90"><input type="number" class="num" value="90" min="10" max="100" style="width:60px" id="m-conv-qn"><span class="ku">%</span></div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="acts">
-                            <button class="btn-run" id="m-btn-run" onclick="mediaProcess()"><i class="ti ti-bolt"></i> Process</button>
-                            <button class="btn-dl" id="m-btn-dl" onclick="mediaDownload()" disabled><i class="ti ti-download"></i> Download</button>
-                            <button class="btn-zip" id="m-btn-zip" onclick="mediaZip()" disabled><i class="ti ti-file-zip"></i> ZIP All</button>
-                        </div>
-
-                        <!-- Progress -->
-                        <div class="pbw" id="m-pb"><div class="pbf" id="m-pbf"></div></div>
-                        
-                        <!-- Status -->
-                        <div class="str"><span class="sc" id="m-status"><span class="dot dw"></span> Ready</span><button class="rlnk" onclick="mediaReset()"><i class="ti ti-refresh"></i> Reset</button></div>
-
-                        <!-- File List -->
-                        <div>
-                            <div class="bl-hdr"><span style="font-size:11px;font-weight:700;color:var(--t2)">Files</span></div>
-                            <div class="flist" id="m-flist"></div>
-                        </div>
-
-                        <!-- Batch Stats -->
-                        <div class="blk-st" id="m-blk-st" style="display:none">
-                            <div class="st"><div class="sl">Total Input</div><div class="sv" id="m-bs-in">-</div></div>
-                            <div class="st"><div class="sl">Total Output</div><div class="sv g" id="m-bs-out">-</div></div>
-                            <div class="st"><div class="sl">Total Saved</div><div class="sv" id="m-bs-saved" style="color:var(--v2)">-</div></div>
-                            <div class="st"><div class="sl">Files Done</div><div class="sv" id="m-bs-done" style="color:var(--g)">-</div></div>
+                    <div class="flex flex-col gap-1 min-w-[180px]">
+                        <span class="text-[10px] text-purple-400 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-robot text-[10px]"></i> Compatible AI Models:
+                        </span>
+                        <div id="detailModelsBadges" class="flex flex-wrap gap-1">
+                            <!-- Injected via JS -->
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
+
+        <!-- Ratio Selector & Leaderboard Chips -->
+        <section class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col gap-3 shadow-xl">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group text-blue-400"></i> Standard Aspect Ratios
+                    </h2>
+                    <span class="text-[11px] text-slate-500">Ordered by match accuracy</span>
+                </div>
+
+                <!-- AI Model Quick Filter Bar -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] text-slate-400 font-semibold">Filter AI Model:</span>
+                    <select id="modelFilterSelect" class="bg-slate-900 border border-slate-700/80 text-purple-300 text-[11px] rounded-lg px-2 py-1 focus:outline-none focus:border-purple-500 font-mono transition">
+                        <option value="ALL">All AI Models</option>
+                        <option value="GPT 2">GPT 2</option>
+                        <option value="Banana Pro">Banana Pro</option>
+                        <option value="Banana 2 Lite">Banana 2 Lite</option>
+                        <option value="Seedream 5 Pro">Seedream 5 Pro</option>
+                        <option value="Google Nano Banana Pro">Google Nano Banana Pro</option>
+                        <option value="Google Nano Banana 2 Lite">Google Nano Banana 2 Lite</option>
+                        <option value="Google Nano Banana 2">Google Nano Banana 2</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Ratio Chips Grid -->
+            <div id="ratioChipsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 relative">
+                <!-- Generated dynamically via JS -->
+            </div>
+        </section>
+
     </div>
 
-    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
-    // ===== NAVIGATION =====
-    function switchView(viewId) {
-        document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(viewId).classList.add('active');
-        
-        const navMap = { 'app-analyzer': 'nav-analyzer', 'app-text': 'nav-text', 'app-media': 'nav-media' };
-        if (navMap[viewId]) document.getElementById(navMap[viewId]).classList.add('active');
-    }
+        // Standard Aspect Ratios Database with Exact AI Model Mappings
+        const STANDARD_RATIOS = [
+            { id: '1:1', name: "1:1 Square", w: 1, h: 1, desc: "Instagram Feed Posts & Profile Pics", models: ["GPT 2", "Banana Pro", "Banana 2 Lite", "Seedream 5 Pro", "Google Nano Banana 2"] },
+            { id: '2:1', name: "2:1 Univisium", w: 2, h: 1, desc: "Streaming Video & Mobile Banner Format", models: ["GPT 2"] },
+            { id: '3:1', name: "3:1 Super Wide", w: 3, h: 1, desc: "Panoramic Banners & Ultra-wide Art", models: ["GPT 2"] },
+            { id: '4:1', name: "4:1 Header Banner", w: 4, h: 1, desc: "Ultra-wide Header Banner", models: ["Google Nano Banana 2"] },
+            { id: '8:1', name: "8:1 Panorama", w: 8, h: 1, desc: "Extreme Wide Panorama Strip", models: ["Google Nano Banana 2"] },
+            { id: '1:4', name: "1:4 Vertical Banner", w: 1, h: 4, desc: "Tall Skyscraper Banner & Vertical Media", models: ["Google Nano Banana 2"] },
+            { id: '1:8', name: "1:8 Ultra Vertical", w: 1, h: 8, desc: "Extreme Tall Vertical Strip", models: ["Google Nano Banana 2"] },
+            { id: '2:3', name: "2:3 Vertical", w: 2, h: 3, desc: "Pinterest Pins & Vertical Photography", models: ["GPT 2", "Banana Pro", "Banana 2 Lite", "Seedream 5 Pro", "Google Nano Banana 2"] },
+            { id: '3:2', name: "3:2 DSLR", w: 3, h: 2, desc: "Classic 35mm Film, DSLR Sensors & Prints", models: ["GPT 2", "Banana Pro", "Banana 2 Lite", "Seedream 5 Pro", "Google Nano Banana 2"] },
+            { id: '3:4', name: "3:4 Tall Portrait", w: 3, h: 4, desc: "Tablets & Vertical Media Format", models: ["GPT 2", "Banana Pro", "Banana 2 Lite", "Seedream 5 Pro", "Google Nano Banana 2"] },
+            { id: '4:3', name: "4:3 Standard", w: 4, h: 3, desc: "Digital Cameras, iPads & Micro 4/3", models: ["GPT 2", "Banana Pro", "Banana 2 Lite", "Seedream 5 Pro", "Google Nano Banana 2"] },
+            { id: '4:5', name: "4:5 Portrait", w: 4, h: 5, desc: "Instagram Vertical Feed & Social Ads", models: ["Google Nano Banana Pro", "Google Nano Banana 2 Lite", "Google Nano Banana 2"] },
+            { id: '5:4', name: "5:4 Format", w: 5, h: 4, desc: "Large Format Prints & Photography", models: ["Google Nano Banana Pro", "Google Nano Banana 2 Lite", "Google Nano Banana 2"] },
+            { id: '16:9', name: "16:9 Widescreen", w: 16, h: 9, desc: "HD Video, YouTube, TV & Monitors", models: ["GPT 2", "Banana Pro", "Banana 2 Lite", "Seedream 5 Pro", "Google Nano Banana 2"] },
+            { id: '9:16', name: "9:16 Vertical", w: 9, h: 16, desc: "TikTok, Reels, Shorts & IG Stories", models: ["GPT 2", "Banana Pro", "Banana 2 Lite", "Seedream 5 Pro", "Google Nano Banana 2"] },
+            { id: '21:9', name: "21:9 Ultrawide", w: 21, h: 9, desc: "Cinematic Movies & Ultrawide Gaming", models: ["Google Nano Banana Pro", "Google Nano Banana 2 Lite", "GPT 2", "Google Nano Banana 2"] },
+            { id: '16:10', name: "16:10 Widescreen", w: 16, h: 10, desc: "MacBooks & Display Monitors", models: [] },
+            { id: '9:21', name: "9:21 Tall Mobile", w: 9, h: 21, desc: "Modern Tall Smartphones Screens", models: [] }
+        ];
 
-    // ===== HASH-BASED NAVIGATION ON PAGE LOAD =====
-    (function() {
-        const hash = window.location.hash.replace('#', '');
-        const hashMap = { 'analyzer': 'app-analyzer', 'text': 'app-text', 'media': 'app-media' };
-        if (hash && hashMap[hash]) {
-            switchView(hashMap[hash]);
+        // State Variables
+        let currentWidth = 1920;
+        let currentHeight = 1080;
+        let activeRatio = STANDARD_RATIOS.find(r => r.id === '16:9');
+        let selectedRatio = STANDARD_RATIOS.find(r => r.id === '16:9');
+        let activeViewMode = 'crop'; // 'crop', 'pad', 'outline'
+        let selectedModelFilter = 'ALL';
+
+        // Image State
+        let loadedImage = null;
+        let imageFileName = '';
+        let imageFileSize = '';
+
+        // DOM References
+        const inputW = document.getElementById('imgWidth');
+        const inputH = document.getElementById('imgHeight');
+        const swapBtn = document.getElementById('swapBtn');
+        const presetSelect = document.getElementById('presetSelect');
+        const exactRatioBadge = document.getElementById('exactRatioBadge');
+        const decimalBadge = document.getElementById('decimalBadge');
+        const visualSvg = document.getElementById('visualSvg');
+        const activeRatioName = document.getElementById('activeRatioName');
+        const ratioChipsGrid = document.getElementById('ratioChipsGrid');
+        const modelFilterSelect = document.getElementById('modelFilterSelect');
+
+        // Drag & Drop / Upload DOM References
+        const dropZone = document.getElementById('dropZone');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const imageInput = document.getElementById('imageInput');
+        const dropPrompt = document.getElementById('dropPrompt');
+        const imageInfoBadge = document.getElementById('imageInfoBadge');
+        const imageFileNameText = document.getElementById('imageFileNameText');
+        const imageMetaText = document.getElementById('imageMetaText');
+        const clearImageBtn = document.getElementById('clearImageBtn');
+
+        // Inspector Card Elements
+        const detailRatioTitle = document.getElementById('detailRatioTitle');
+        const detailMatchScore = document.getElementById('detailMatchScore');
+        const detailDesc = document.getElementById('detailDesc');
+        const detailCropAdvice = document.getElementById('detailCropAdvice');
+        const detailModelsBadges = document.getElementById('detailModelsBadges');
+
+        // Greatest Common Divisor
+        function getGCD(a, b) {
+            a = Math.abs(Math.round(a));
+            b = Math.abs(Math.round(b));
+            while (b) {
+                let temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a || 1;
         }
-    })();
 
-    // ===== APP 1: ASPECT RATIO ANALYZER =====
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const resultsGrid = document.getElementById('results-grid');
+        // File Handler & Image Reader
+        uploadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            imageInput.click();
+        });
 
-    const commonRatios = [
-        { w: 1, h: 1, name: '1:1', use: 'Instagram Post' },
-        { w: 4, h: 5, name: '4:5', use: 'Instagram Portrait' },
-        { w: 16, h: 9, name: '16:9', use: 'YouTube/Widescreen' },
-        { w: 9, h: 16, name: '9:16', use: 'Stories/Reels/TikTok' },
-        { w: 4, h: 3, name: '4:3', use: 'Standard Photo' },
-        { w: 3, h: 2, name: '3:2', use: 'Classic Film' },
-        { w: 21, h: 9, name: '21:9', use: 'Ultrawide' },
-        { w: 2, h: 3, name: '2:3', use: 'Portrait Photo' },
-        { w: 1, h: 2, name: '1:2', use: 'Tall Banner' },
-        { w: 3, h: 4, name: '3:4', use: 'Portrait Standard' },
-    ];
+        dropZone.addEventListener('click', (e) => {
+            if (e.target.closest('#clearImageBtn') || e.target.closest('.view-mode-btn')) return;
+            imageInput.click();
+        });
 
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drop-zone-active'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-zone-active'));
-    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drop-zone-active'); handleFiles(e.dataTransfer.files); });
-    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleImageFile(e.target.files[0]);
+            }
+        });
 
-    function handleFiles(files) {
-        Array.from(files).forEach(file => {
-            if (!file.type.startsWith('image/')) return;
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('border-blue-500', 'bg-blue-950/40');
+                dropPrompt.classList.remove('opacity-0');
+                dropPrompt.classList.add('opacity-100');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('border-blue-500', 'bg-blue-950/40');
+                dropPrompt.classList.remove('opacity-100');
+                dropPrompt.classList.add('opacity-0');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files[0]) {
+                handleImageFile(files[0]);
+            }
+        });
+
+        function handleImageFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload a valid image file (JPG, PNG, WEBP, GIF, SVG).');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
-                img.onload = () => analyzeImage(img, file.name, e.target.result);
+                img.onload = () => {
+                    loadedImage = e.target.result;
+                    imageFileName = file.name;
+                    const kb = (file.size / 1024).toFixed(0);
+                    imageFileSize = kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`;
+
+                    // Update inputs to match image's natural dimensions
+                    inputW.value = img.naturalWidth;
+                    inputH.value = img.naturalHeight;
+
+                    // Update Badge UI
+                    imageFileNameText.textContent = imageFileName;
+                    imageMetaText.textContent = `(${img.naturalWidth}×${img.naturalHeight}, ${imageFileSize})`;
+                    imageInfoBadge.classList.remove('hidden');
+
+                    updateAll();
+                };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-        });
-    }
-
-    function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
-
-    function analyzeImage(img, name, src) {
-        const w = img.naturalWidth, h = img.naturalHeight;
-        const d = gcd(w, h);
-        const rw = w / d, rh = h / d;
-        const decimal = w / h;
-
-        let closest = commonRatios[0], minDiff = Infinity;
-        commonRatios.forEach(r => {
-            const diff = Math.abs((r.w / r.h) - decimal);
-            if (diff < minDiff) { minDiff = diff; closest = r; }
-        });
-
-        const card = document.createElement('div');
-        card.className = 'image-card group relative bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-xl overflow-hidden hover:border-cyan-500/30 transition-all duration-300 animate-fade-in-up';
-        card.innerHTML = `
-            <div class="relative h-48 overflow-hidden bg-slate-800/50">
-                <img src="${src}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="${name}">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <button onclick="this.closest('.image-card').remove()" class="delete-btn absolute top-2 right-2 w-8 h-8 bg-red-500/80 rounded-lg flex items-center justify-center opacity-0 transform scale-75 transition-all duration-200 hover:bg-red-500">
-                    <i class="ph ph-x text-white text-sm"></i>
-                </button>
-            </div>
-            <div class="p-4 space-y-3">
-                <p class="text-sm font-semibold text-white truncate">${name}</p>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="bg-slate-800/50 rounded-lg p-2 border border-slate-700/30">
-                        <span class="text-slate-500 block">Size</span>
-                        <span class="text-white font-bold">${w} x ${h}</span>
-                    </div>
-                    <div class="bg-slate-800/50 rounded-lg p-2 border border-slate-700/30">
-                        <span class="text-slate-500 block">Ratio</span>
-                        <span class="text-cyan-400 font-bold">${rw}:${rh}</span>
-                    </div>
-                </div>
-                <div class="bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 rounded-lg p-3 border border-cyan-500/20">
-                    <div class="flex items-center gap-2">
-                        <i class="ph-fill ph-target text-cyan-400"></i>
-                        <div>
-                            <span class="text-[10px] text-slate-400 block">Closest Match</span>
-                            <span class="text-sm font-bold text-white">${closest.name}</span>
-                            <span class="text-[10px] text-cyan-400 ml-1">${closest.use}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-[10px] text-slate-500 flex justify-between">
-                    <span>Decimal: ${decimal.toFixed(4)}</span>
-                    <span>Megapixels: ${((w * h) / 1000000).toFixed(2)} MP</span>
-                </div>
-            </div>
-        `;
-        resultsGrid.appendChild(card);
-    }
-
-    // ===== APP 2: TEXT STUDIO =====
-    const textInput = document.getElementById('text-input');
-    const charCount = document.getElementById('char-count');
-    const wordCount = document.getElementById('word-count');
-
-    textInput.addEventListener('input', updateCounts);
-
-    function updateCounts() {
-        const text = textInput.value;
-        charCount.textContent = `${text.length} chars`;
-        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-        wordCount.textContent = `${words} words`;
-    }
-
-    function transformText(type) {
-        const text = textInput.value;
-        if (!text) return;
-
-        let result;
-        switch (type) {
-            case 'upper': result = text.toUpperCase(); break;
-            case 'lower': result = text.toLowerCase(); break;
-            case 'title': result = text.replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.substr(1).toLowerCase()); break;
-            case 'sentence': result = text.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase()); break;
-            case 'camel': result = text.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase()); break;
-            case 'snake': result = text.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''); break;
-            case 'kebab': result = text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''); break;
-            case 'reverse': result = text.split('').reverse().join(''); break;
-            case 'trim': result = text.replace(/\s+/g, ' ').trim(); break;
-            case 'removeSpaces': result = text.replace(/\s/g, ''); break;
-            default: result = text;
         }
 
-        textInput.value = result;
-        textInput.classList.add('flash-success');
-        setTimeout(() => textInput.classList.remove('flash-success'), 400);
-        updateCounts();
-    }
+        clearImageBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            loadedImage = null;
+            imageFileName = '';
+            imageFileSize = '';
+            imageInput.value = '';
+            imageInfoBadge.classList.add('hidden');
+            renderSvg();
+        });
 
-    function copyText() {
-        const text = textInput.value;
-        if (!text) return;
-        navigator.clipboard.writeText(text);
-    }
+        // Calculate Ratio Match Score & Cropping Specs
+        function calculateMatchSpecs(imgW, imgH, targetW, targetH) {
+            const imgRatio = imgW / imgH;
+            const targetRatio = targetW / targetH;
 
-    // ===== APP 3: MEDIA COMPRESS & UPSCALE =====
-    const M = {
-        mode: 'compress',
-        files: [],
-        processed: [],
-        fmt: 'auto',
-        convFmt: 'jpeg',
-        scale: 2,
-        init() {
-            const dz = document.getElementById('m-dz');
-            const fin = document.getElementById('m-fin');
-            dz.addEventListener('click', () => fin.click());
-            dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('ov'); });
-            dz.addEventListener('dragleave', () => dz.classList.remove('ov'));
-            dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('ov'); M.addFiles(e.dataTransfer.files); });
-            fin.addEventListener('change', e => M.addFiles(e.target.files));
+            // Closeness score
+            const ratioDiff = Math.abs(Math.log(imgRatio / targetRatio));
+            const matchScore = Math.max(0, Math.min(100, Math.round((1 - ratioDiff) * 100)));
 
-            // Format buttons
-            document.querySelectorAll('#m-fmt-btns .fb').forEach(b => b.addEventListener('click', () => {
-                document.querySelectorAll('#m-fmt-btns .fb').forEach(x => x.classList.remove('on'));
-                b.classList.add('on'); M.fmt = b.dataset.f;
-            }));
-            document.querySelectorAll('#m-conv-btns .fb').forEach(b => b.addEventListener('click', () => {
-                document.querySelectorAll('#m-conv-btns .fb').forEach(x => x.classList.remove('on'));
-                b.classList.add('on'); M.convFmt = b.dataset.f;
-            }));
-            document.querySelectorAll('#m-scale-btns .sb').forEach(b => b.addEventListener('click', () => {
-                document.querySelectorAll('#m-scale-btns .sb').forEach(x => x.classList.remove('on'));
-                b.classList.add('on'); M.scale = parseInt(b.dataset.s);
-            }));
+            let advice = "";
+            let cropW = 0, cropH = 0;
 
-            // Quality sync
-            const convQ = document.getElementById('m-conv-q');
-            const convQn = document.getElementById('m-conv-qn');
-            convQ.addEventListener('input', () => { convQn.value = convQ.value; });
-            convQn.addEventListener('change', () => { convQ.value = convQn.value; });
-
-            M.buildQBars();
-        },
-        buildQBars() {
-            const c = document.getElementById('m-qbars');
-            c.innerHTML = '';
-            for (let i = 0; i < 10; i++) c.innerHTML += '<div class="qb"></div>';
-        },
-        updateQBars(val) {
-            const bars = document.querySelectorAll('#m-qbars .qb');
-            const level = Math.ceil(val / 10);
-            bars.forEach((b, i) => {
-                b.className = 'qb';
-                if (i < level) b.classList.add(level > 7 ? 'lg' : level > 4 ? 'ly' : 'lr');
-            });
-            document.getElementById('m-qv').textContent = val + '%';
-        },
-        addFiles(fileList) {
-            Array.from(fileList).forEach(f => {
-                if (!f.type.startsWith('image/') && f.type !== 'application/pdf') return;
-                M.files.push({ file: f, name: f.name, size: f.size, type: f.type, processed: false, output: null });
-            });
-            if (M.files.length) {
-                document.getElementById('m-dz').style.display = 'none';
-                document.getElementById('m-ca').style.display = 'flex';
-                M.updateUI();
-                M.previewFirst();
+            if (Math.abs(imgRatio - targetRatio) < 0.001) {
+                advice = "Perfect Match! No crop or pad required.";
+            } else if (imgRatio > targetRatio) {
+                const idealW = Math.round(imgH * targetRatio);
+                cropW = imgW - idealW;
+                const cropPct = ((cropW / imgW) * 100).toFixed(1);
+                advice = `Crop ${cropW}px off width (${Math.round(cropW / 2)}px each side, ${cropPct}% area loss)`;
+            } else {
+                const idealH = Math.round(imgW / targetRatio);
+                cropH = imgH - idealH;
+                const cropPct = ((cropH / imgH) * 100).toFixed(1);
+                advice = `Crop ${cropH}px off height (${Math.round(cropH / 2)}px top/bottom, ${cropPct}% area loss)`;
             }
-        },
-        previewFirst() {
-            const f = M.files[0];
-            if (!f) return;
-            if (f.type.startsWith('image/')) {
-                const r = new FileReader();
-                r.onload = e => {
-                    document.getElementById('m-orig-wrap').innerHTML = `<img src="${e.target.result}">`;
-                    const img = new Image();
-                    img.onload = () => { document.getElementById('m-orig-dim').textContent = img.width + 'x' + img.height; };
-                    img.src = e.target.result;
-                };
-                r.readAsDataURL(f.file);
+
+            return { matchScore, advice, imgRatio, targetRatio };
+        }
+
+        // Render SVG Canvas Visualizer
+        function renderSvg() {
+            if (!activeRatio) return;
+
+            const canvasW = 600;
+            const canvasH = 360;
+            const padding = 35;
+
+            const maxW = canvasW - (padding * 2);
+            const maxH = canvasH - (padding * 2);
+
+            const imgRatio = currentWidth / currentHeight;
+            const targetRatio = activeRatio.w / activeRatio.h;
+
+            // Image Dimensions Box
+            let boxW, boxH;
+            if (imgRatio > (maxW / maxH)) {
+                boxW = maxW;
+                boxH = maxW / imgRatio;
+            } else {
+                boxH = maxH;
+                boxW = maxH * imgRatio;
             }
-            document.getElementById('m-orig-type').textContent = f.type.split('/')[1].toUpperCase();
-        },
-        updateUI() {
-            document.getElementById('m-count').textContent = M.files.length;
-            document.getElementById('m-s-orig').textContent = M.formatSize(M.files.reduce((a, f) => a + f.size, 0));
-            M.renderFileList();
-        },
-        renderFileList() {
-            const list = document.getElementById('m-flist');
-            list.innerHTML = '';
-            M.files.forEach((f, i) => {
-                const row = document.createElement('div');
-                row.className = 'frow';
-                row.innerHTML = `
-                    <div class="fthumb" style="background:var(--s3)"></div>
-                    <div class="fname">${f.name}</div>
-                    <div class="forig">${M.formatSize(f.size)}</div>
-                    <div class="fout">${f.output ? M.formatSize(f.output.size) : '-'}</div>
-                    <div class="fst"><span class="dot ${f.processed ? 'dd' : 'dw'}"></span><span style="font-size:10px;color:${f.processed ? 'var(--g)' : 'var(--t4)'}">${f.processed ? 'Done' : 'Pending'}</span></div>
-                    <button class="fdel" onclick="M.removeFile(${i})"><i class="ti ti-x"></i></button>
+
+            const imgX = (canvasW - boxW) / 2;
+            const imgY = (canvasH - boxH) / 2;
+
+            // Target Dimensions Box
+            let targetBoxW, targetBoxH;
+            if (activeViewMode === 'crop') {
+                if (imgRatio > targetRatio) {
+                    targetBoxH = boxH;
+                    targetBoxW = boxH * targetRatio;
+                } else {
+                    targetBoxW = boxW;
+                    targetBoxH = boxW / targetRatio;
+                }
+            } else if (activeViewMode === 'pad') {
+                if (imgRatio > targetRatio) {
+                    targetBoxW = boxW;
+                    targetBoxH = boxW / targetRatio;
+                } else {
+                    targetBoxH = boxH;
+                    targetBoxW = boxH * targetRatio;
+                }
+            } else {
+                targetBoxW = boxH * targetRatio;
+                if (targetBoxW > maxW) {
+                    targetBoxW = maxW;
+                    targetBoxH = maxW / targetRatio;
+                } else {
+                    targetBoxH = boxH;
+                }
+            }
+
+            const targetX = (canvasW - targetBoxW) / 2;
+            const targetY = (canvasH - targetBoxH) / 2;
+
+            let svgContent = `
+                <defs>
+                    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                    </pattern>
+                    <clipPath id="imgClip">
+                        <rect x="${imgX}" y="${imgY}" width="${boxW}" height="${boxH}" rx="6" />
+                    </clipPath>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            `;
+
+            // Draw Base Image or Placeholder Box
+            if (loadedImage) {
+                svgContent += `
+                    <image href="${loadedImage}" x="${imgX}" y="${imgY}" width="${boxW}" height="${boxH}" preserveAspectRatio="none" clip-path="url(#imgClip)" />
+                    <rect x="${imgX}" y="${imgY}" width="${boxW}" height="${boxH}" rx="6" fill="none" stroke="#3b82f6" stroke-width="2" />
                 `;
-                list.appendChild(row);
-            });
-        },
-        removeFile(i) {
-            M.files.splice(i, 1);
-            if (!M.files.length) M.reset();
-            else M.updateUI();
-        },
-        reset() {
-            M.files = []; M.processed = [];
-            document.getElementById('m-dz').style.display = 'flex';
-            document.getElementById('m-ca').style.display = 'none';
-            document.getElementById('m-blk-st').style.display = 'none';
-            document.getElementById('m-out-wrap').innerHTML = '<div class="ph"><i class="ti ti-sparkles" style="font-size:24px"></i><span style="font-size:10px">Processed Preview</span></div>';
-            document.getElementById('m-out-type').textContent = '-';
-            document.getElementById('m-out-dim').textContent = '-';
-            document.getElementById('m-s-out').textContent = '-';
-            document.getElementById('m-s-saved').textContent = '-';
-            document.getElementById('m-btn-dl').disabled = true;
-            document.getElementById('m-btn-zip').disabled = true;
-            document.getElementById('m-status').className = 'sc';
-            document.getElementById('m-status').innerHTML = '<span class="dot dw"></span> Ready';
-            M.updateUI();
-        },
-        formatSize(b) {
-            if (b < 1024) return b + ' B';
-            if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
-            return (b / 1048576).toFixed(2) + ' MB';
-        },
-        async process() {
-            const pb = document.getElementById('m-pb');
-            const pbf = document.getElementById('m-pbf');
-            pb.style.display = 'block';
-            pbf.style.width = '0%';
-            document.getElementById('m-status').className = 'sc';
-            document.getElementById('m-status').innerHTML = '<span class="dot dw"></span> Processing...';
+            } else {
+                svgContent += `<rect x="${imgX}" y="${imgY}" width="${boxW}" height="${boxH}" rx="6" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="2" />`;
+            }
 
-            M.processed = [];
-            let totalOut = 0;
-
-            for (let i = 0; i < M.files.length; i++) {
-                const f = M.files[i];
-                try {
-                    let result;
-                    if (M.mode === 'compress') result = await M.compressFile(f);
-                    else if (M.mode === 'upscale') result = await M.upscaleFile(f);
-                    else result = await M.convertFile(f);
-
-                    f.processed = true;
-                    f.output = result;
-                    M.processed.push(result);
-                    totalOut += result.size;
-                } catch (e) {
-                    console.error('Process error:', e);
+            if (activeViewMode === 'crop') {
+                // Crop cut regions
+                if (imgRatio > targetRatio) {
+                    const cutW = (boxW - targetBoxW) / 2;
+                    svgContent += `
+                        <rect x="${imgX}" y="${imgY}" width="${cutW}" height="${boxH}" fill="rgba(239, 68, 68, 0.4)" stroke="#ef4444" stroke-width="1" stroke-dasharray="3 3"/>
+                        <rect x="${imgX + boxW - cutW}" y="${imgY}" width="${cutW}" height="${boxH}" fill="rgba(239, 68, 68, 0.4)" stroke="#ef4444" stroke-width="1" stroke-dasharray="3 3"/>
+                    `;
+                } else if (imgRatio < targetRatio) {
+                    const cutH = (boxH - targetBoxH) / 2;
+                    svgContent += `
+                        <rect x="${imgX}" y="${imgY}" width="${boxW}" height="${cutH}" fill="rgba(239, 68, 68, 0.4)" stroke="#ef4444" stroke-width="1" stroke-dasharray="3 3"/>
+                        <rect x="${imgX}" y="${imgY + boxH - cutH}" width="${boxW}" height="${cutH}" fill="rgba(239, 68, 68, 0.4)" stroke="#ef4444" stroke-width="1" stroke-dasharray="3 3"/>
+                    `;
                 }
-                pbf.style.width = ((i + 1) / M.files.length * 100) + '%';
-            }
 
-            const totalIn = M.files.reduce((a, f) => a + f.size, 0);
-            document.getElementById('m-s-out').textContent = M.formatSize(totalOut);
-            const saved = totalIn > 0 ? ((1 - totalOut / totalIn) * 100).toFixed(1) : 0;
-            document.getElementById('m-s-saved').textContent = (saved > 0 ? '-' : '+') + Math.abs(saved) + '%';
+                // Target Outline
+                svgContent += `<rect x="${targetX}" y="${targetY}" width="${targetBoxW}" height="${targetBoxH}" rx="6" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6 4" />`;
 
-            // Show batch stats
-            document.getElementById('m-blk-st').style.display = 'grid';
-            document.getElementById('m-bs-in').textContent = M.formatSize(totalIn);
-            document.getElementById('m-bs-out').textContent = M.formatSize(totalOut);
-            document.getElementById('m-bs-saved').textContent = (saved > 0 ? '-' : '+') + Math.abs(saved) + '%';
-            document.getElementById('m-bs-done').textContent = M.processed.length + '/' + M.files.length;
+            } else if (activeViewMode === 'pad') {
+                // Outer Target Padded Box
+                svgContent += `<rect x="${targetX}" y="${targetY}" width="${targetBoxW}" height="${targetBoxH}" rx="6" fill="rgba(16, 185, 129, 0.1)" stroke="#10b981" stroke-width="2" stroke-dasharray="6 4" />`;
 
-            // Preview first result
-            if (M.processed.length > 0) {
-                const first = M.processed[0];
-                if (first.url) {
-                    document.getElementById('m-out-wrap').innerHTML = `<img src="${first.url}">`;
-                    document.getElementById('m-out-type').textContent = first.ext.toUpperCase();
-                    if (first.width) document.getElementById('m-out-dim').textContent = first.width + 'x' + first.height;
+                // Padding Regions
+                if (imgRatio > targetRatio) {
+                    const padH = (targetBoxH - boxH) / 2;
+                    svgContent += `
+                        <rect x="${targetX}" y="${targetY}" width="${targetBoxW}" height="${padH}" fill="rgba(59, 130, 246, 0.25)" stroke="#3b82f6" stroke-width="1"/>
+                        <rect x="${targetX}" y="${targetY + targetBoxH - padH}" width="${targetBoxW}" height="${padH}" fill="rgba(59, 130, 246, 0.25)" stroke="#3b82f6" stroke-width="1"/>
+                    `;
+                } else if (imgRatio < targetRatio) {
+                    const padW = (targetBoxW - boxW) / 2;
+                    svgContent += `
+                        <rect x="${targetX}" y="${targetY}" width="${padW}" height="${targetBoxH}" fill="rgba(59, 130, 246, 0.25)" stroke="#3b82f6" stroke-width="1"/>
+                        <rect x="${targetX + targetBoxW - padW}" y="${targetY}" width="${padW}" height="${targetBoxH}" fill="rgba(59, 130, 246, 0.25)" stroke="#3b82f6" stroke-width="1"/>
+                    `;
                 }
+
+                // Target Outline
+                svgContent += `<rect x="${targetX}" y="${targetY}" width="${targetBoxW}" height="${targetBoxH}" rx="6" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="6 4" />`;
+
+            } else {
+                // Outline Mode
+                svgContent += `
+                    <rect x="${targetX}" y="${targetY}" width="${targetBoxW}" height="${targetBoxH}" rx="6" fill="rgba(16, 185, 129, 0.12)" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6 4" />
+                `;
             }
 
-            document.getElementById('m-btn-dl').disabled = false;
-            document.getElementById('m-btn-zip').disabled = M.processed.length < 2;
-            document.getElementById('m-status').className = 'sc ok';
-            document.getElementById('m-status').innerHTML = '<span class="dot dd"></span> Complete';
-            M.renderFileList();
+            // Dimension Label Backdrop Pill & Text
+            const textW = 120;
+            const textH = 22;
+            svgContent += `
+                <rect x="${imgX + boxW/2 - textW/2}" y="${imgY + boxH/2 - textH/2}" width="${textW}" height="${textH}" rx="11" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
+                <text x="${imgX + boxW/2}" y="${imgY + boxH/2}" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="middle" font-family="monospace">
+                    ${currentWidth} × ${currentHeight}
+                </text>
+            `;
 
-            setTimeout(() => { pb.style.display = 'none'; }, 1000);
-        },
-        async compressFile(f) {
-            const quality = parseInt(document.getElementById('m-quality').value) / 100;
-            const maxW = parseInt(document.getElementById('m-maxw').value) || 0;
-            let fmt = M.fmt === 'auto' ? (f.type === 'image/png' ? 'png' : 'jpeg') : M.fmt;
-            const mime = fmt === 'png' ? 'image/png' : fmt === 'webp' ? 'image/webp' : 'image/jpeg';
+            visualSvg.innerHTML = svgContent;
+            activeRatioName.textContent = `${activeRatio.w}:${activeRatio.h} (${activeRatio.name})`;
 
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => {
-                    let w = img.width, h = img.height;
-                    if (maxW > 0 && w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-                    const c = document.createElement('canvas');
-                    c.width = w; c.height = h;
-                    const ctx = c.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-                    c.toBlob(blob => {
-                        if (!blob) return reject('Blob failed');
-                        const url = URL.createObjectURL(blob);
-                        resolve({ blob, url, size: blob.size, ext: fmt, name: f.name.replace(/\.[^.]+$/, '.' + (fmt === 'jpeg' ? 'jpg' : fmt)), width: w, height: h });
-                    }, mime, quality);
-                };
-                img.onerror = reject;
-                const r = new FileReader();
-                r.onload = e => img.src = e.target.result;
-                r.readAsDataURL(f.file);
-            });
-        },
-        async upscaleFile(f) {
-            const scale = M.scale;
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => {
-                    const w = img.width * scale, h = img.height * scale;
-                    const c = document.createElement('canvas');
-                    c.width = w; c.height = h;
-                    const ctx = c.getContext('2d');
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-                    ctx.drawImage(img, 0, 0, w, h);
-                    c.toBlob(blob => {
-                        if (!blob) return reject('Blob failed');
-                        const url = URL.createObjectURL(blob);
-                        resolve({ blob, url, size: blob.size, ext: 'png', name: f.name.replace(/\.[^.]+$/, `_${scale}x.png`), width: w, height: h });
-                    }, 'image/png');
-                };
-                img.onerror = reject;
-                const r = new FileReader();
-                r.onload = e => img.src = e.target.result;
-                r.readAsDataURL(f.file);
-            });
-        },
-        async convertFile(f) {
-            const fmt = M.convFmt;
-            const quality = parseInt(document.getElementById('m-conv-q').value) / 100;
-
-            if (fmt === 'pdf') {
-                return new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF({ orientation: img.width > img.height ? 'landscape' : 'portrait', unit: 'px', format: [img.width, img.height] });
-                        pdf.addImage(img, 'JPEG', 0, 0, img.width, img.height);
-                        const blob = pdf.output('blob');
-                        const url = URL.createObjectURL(blob);
-                        resolve({ blob, url, size: blob.size, ext: 'pdf', name: f.name.replace(/\.[^.]+$/, '.pdf'), width: img.width, height: img.height });
-                    };
-                    img.onerror = reject;
-                    const r = new FileReader();
-                    r.onload = e => img.src = e.target.result;
-                    r.readAsDataURL(f.file);
-                });
-            }
-
-            const mime = fmt === 'png' ? 'image/png' : fmt === 'webp' ? 'image/webp' : 'image/jpeg';
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => {
-                    const c = document.createElement('canvas');
-                    c.width = img.width; c.height = img.height;
-                    const ctx = c.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    c.toBlob(blob => {
-                        if (!blob) return reject('Blob failed');
-                        const url = URL.createObjectURL(blob);
-                        resolve({ blob, url, size: blob.size, ext: fmt === 'jpeg' ? 'jpg' : fmt, name: f.name.replace(/\.[^.]+$/, '.' + (fmt === 'jpeg' ? 'jpg' : fmt)), width: img.width, height: img.height });
-                    }, mime, quality);
-                };
-                img.onerror = reject;
-                const r = new FileReader();
-                r.onload = e => img.src = e.target.result;
-                r.readAsDataURL(f.file);
-            });
-        },
-        download() {
-            if (!M.processed.length) return;
-            const p = M.processed[0];
-            const a = document.createElement('a');
-            a.href = p.url; a.download = p.name; a.click();
-        },
-        async zip() {
-            if (M.processed.length < 2) return;
-            const zip = new JSZip();
-            M.processed.forEach(p => zip.file(p.name, p.blob));
-            const blob = await zip.generateAsync({ type: 'blob' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'processed_files.zip';
-            a.click();
+            // Update Inspector Card
+            updateInspector(activeRatio);
         }
-    };
 
-    function mediaSetMode(mode) {
-        M.mode = mode;
-        document.querySelectorAll('.seg').forEach(s => s.classList.remove('on'));
-        event.currentTarget.classList.add('on');
-        document.getElementById('m-ctrl-compress').style.display = mode === 'compress' ? 'block' : 'none';
-        document.getElementById('m-ctrl-upscale').style.display = mode === 'upscale' ? 'block' : 'none';
-        document.getElementById('m-ctrl-convert').style.display = mode === 'convert' ? 'block' : 'none';
-    }
+        // Update Inspector Banner
+        function updateInspector(item) {
+            const specs = calculateMatchSpecs(currentWidth, currentHeight, item.w, item.h);
+            detailRatioTitle.textContent = `${item.w}:${item.h} - ${item.name}`;
+            detailMatchScore.textContent = `${specs.matchScore}% Match`;
+            detailDesc.textContent = item.desc;
+            detailCropAdvice.textContent = specs.advice;
 
-    function mediaUpdateQuality(val) {
-        val = Math.max(10, Math.min(100, parseInt(val) || 80));
-        document.getElementById('m-quality').value = val;
-        document.getElementById('m-quality-num').value = val;
-        M.updateQBars(val);
-    }
+            if (item.models && item.models.length > 0) {
+                detailModelsBadges.innerHTML = item.models.map(m => 
+                    `<span class="bg-purple-950/80 text-purple-300 border border-purple-800/80 text-[9px] px-1.5 py-0.5 rounded-md font-mono">${m}</span>`
+                ).join('');
+            } else {
+                detailModelsBadges.innerHTML = `<span class="text-[10px] text-slate-500 italic">No AI models mapped</span>`;
+            }
+        }
 
-    function mediaProcess() { M.process(); }
-    function mediaDownload() { M.download(); }
-    function mediaZip() { M.zip(); }
-    function mediaReset() { M.reset(); }
+        // Render Minimal Ratio Chips
+        function renderRatioChips() {
+            // Filter by model if selected
+            let filtered = STANDARD_RATIOS;
+            if (selectedModelFilter !== 'ALL') {
+                filtered = STANDARD_RATIOS.filter(item => item.models && item.models.includes(selectedModelFilter));
+            }
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-        M.init();
-        mediaUpdateQuality(80);
-    });
+            // Rank ratios by match score
+            const ranked = filtered.map(item => {
+                const specs = calculateMatchSpecs(currentWidth, currentHeight, item.w, item.h);
+                return { ...item, ...specs };
+            }).sort((a, b) => b.matchScore - a.matchScore);
+
+            // Set default selected ratio if not present
+            if (ranked.length > 0 && !ranked.some(r => r.id === selectedRatio.id)) {
+                selectedRatio = ranked[0];
+            }
+            activeRatio = selectedRatio || ranked[0];
+
+            ratioChipsGrid.innerHTML = '';
+
+            if (ranked.length === 0) {
+                ratioChipsGrid.innerHTML = `<div class="col-span-full py-6 text-center text-xs text-slate-500">No aspect ratios match the selected AI model filter (${selectedModelFilter}).</div>`;
+                return;
+            }
+
+            ranked.forEach((item, index) => {
+                const isSelected = selectedRatio && selectedRatio.id === item.id;
+                const isClosest = index === 0;
+
+                const scoreColor = item.matchScore >= 95 ? 'text-emerald-400 bg-emerald-950/80 border-emerald-800/80' : 
+                                  (item.matchScore >= 80 ? 'text-blue-400 bg-blue-950/80 border-blue-800/80' : 'text-slate-400 bg-slate-900 border-slate-800');
+
+                // Determine tooltip direction based on row position to prevent cut-off
+                const isTopRow = index < 4;
+                const popoverPosClass = isTopRow ? 'top-full mt-2.5' : 'bottom-full mb-2.5';
+
+                const chip = document.createElement('div');
+                chip.className = `has-popover relative ratio-chip p-2.5 rounded-xl border cursor-pointer transition flex items-center justify-between gap-2 ${
+                    isSelected 
+                        ? 'bg-blue-950/40 border-blue-500 ring-1 ring-blue-500/50 shadow-lg' 
+                        : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700 hover:bg-slate-800/60'
+                }`;
+
+                chip.innerHTML = `
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="font-mono font-bold text-xs text-slate-200">
+                            ${item.w}:${item.h}
+                        </span>
+                        ${isClosest ? '<i class="fa-solid fa-crown text-[10px] text-amber-400" title="Closest Match"></i>' : ''}
+                    </div>
+                    <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md border ${scoreColor}">
+                        ${item.matchScore}%
+                    </span>
+
+                    <!-- HOVER POPOVER TOOLTIP -->
+                    <div class="hover-popover absolute ${popoverPosClass} left-1/2 -translate-x-1/2 w-64 p-3 bg-slate-900 border border-slate-700/90 rounded-xl shadow-2xl z-50 text-left pointer-events-none">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 mb-1.5">
+                            <span class="font-bold text-xs text-slate-100">${item.name}</span>
+                            <span class="text-[10px] font-mono text-emerald-400 font-bold">${item.matchScore}% Match</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mb-2 leading-relaxed">${item.desc}</p>
+                        <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800 text-[10px] font-mono text-slate-300">
+                            <span class="text-blue-400 font-semibold block mb-0.5">Crop Specs:</span>
+                            ${item.advice}
+                        </div>
+                        ${item.models && item.models.length > 0 ? `
+                        <div class="mt-2 pt-2 border-t border-slate-800/80">
+                            <span class="text-[10px] text-purple-400 font-semibold flex items-center gap-1 mb-1">
+                                <i class="fa-solid fa-robot text-[10px]"></i> Compatible AI Models:
+                            </span>
+                            <div class="flex flex-wrap gap-1">
+                                ${item.models.map(m => `<span class="bg-purple-950/70 text-purple-300 border border-purple-800/60 text-[9px] px-1.5 py-0.5 rounded-md font-mono">${m}</span>`).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                // Hover events -> Live update canvas preview
+                chip.addEventListener('mouseenter', () => {
+                    activeRatio = item;
+                    renderSvg();
+                });
+
+                chip.addEventListener('mouseleave', () => {
+                    activeRatio = selectedRatio;
+                    renderSvg();
+                });
+
+                // Click event -> Lock active ratio
+                chip.addEventListener('click', () => {
+                    selectedRatio = item;
+                    activeRatio = item;
+                    renderRatioChips();
+                    renderSvg();
+                });
+
+                ratioChipsGrid.appendChild(chip);
+            });
+
+            renderSvg();
+        }
+
+        // Update App
+        function updateAll() {
+            currentWidth = Math.max(1, parseInt(inputW.value) || 1);
+            currentHeight = Math.max(1, parseInt(inputH.value) || 1);
+
+            // Exact Ratio
+            const gcd = getGCD(currentWidth, currentHeight);
+            exactRatioBadge.textContent = `${Math.round(currentWidth / gcd)} : ${Math.round(currentHeight / gcd)}`;
+            decimalBadge.textContent = `(${(currentWidth / currentHeight).toFixed(3)})`;
+
+            renderRatioChips();
+        }
+
+        // Input listeners
+        inputW.addEventListener('input', updateAll);
+        inputH.addEventListener('input', updateAll);
+
+        // Swap button
+        swapBtn.addEventListener('click', () => {
+            const temp = inputW.value;
+            inputW.value = inputH.value;
+            inputH.value = temp;
+            updateAll();
+        });
+
+        // Presets
+        presetSelect.addEventListener('change', (e) => {
+            if (!e.target.value) return;
+            const [w, h] = e.target.value.split('x');
+            inputW.value = w;
+            inputH.value = h;
+            presetSelect.value = "";
+            updateAll();
+        });
+
+        // AI Model Filter Switcher
+        modelFilterSelect.addEventListener('change', (e) => {
+            selectedModelFilter = e.target.value;
+            renderRatioChips();
+        });
+
+        // Mode Switchers
+        const modes = [
+            { btn: document.getElementById('modeCrop'), mode: 'crop' },
+            { btn: document.getElementById('modePad'), mode: 'pad' },
+            { btn: document.getElementById('modeOutline'), mode: 'outline' }
+        ];
+
+        modes.forEach(m => {
+            m.btn.addEventListener('click', () => {
+                modes.forEach(x => x.btn.className = 'view-mode-btn px-2.5 py-1 text-[11px] font-medium rounded-lg text-slate-400 hover:text-slate-200 transition');
+                m.btn.className = 'view-mode-btn px-2.5 py-1 text-[11px] font-medium rounded-lg bg-blue-600 text-white transition';
+                activeViewMode = m.mode;
+                renderSvg();
+            });
+        });
+
+        // Initial Run
+        updateAll();
     </script>
 </body>
 </html>
