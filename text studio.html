@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #0B101E;
+            color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: #131B2C;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 24px;
+            background: rgba(19, 27, 44, 0.6);
+            border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #e2e8f0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-label {
+            font-weight: 500;
+        }
+
+        .stat-divider {
+            width: 1px;
+            height: 16px;
+            background: #1e293b;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* Toolbar Panel */
+        .toolbar-panel {
+            width: 280px;
+            background: #131B2C;
+            border-right: 1px solid rgba(30, 41, 59, 0.8);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .tool-section {
+            padding: 16px;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+        }
+
+        .tool-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .tool-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-align: left;
+        }
+
+        .tool-btn:hover {
+            background: rgba(30, 41, 59, 0.4);
+            color: #e2e8f0;
+            border-color: rgba(30, 41, 59, 0.6);
+        }
+
+        .tool-btn:active {
+            transform: scale(0.98);
+        }
+
+        .tool-btn svg {
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+
+        .tool-btn:hover svg {
+            opacity: 1;
+        }
+
+        /* Find and Replace */
+        .find-replace-section {
+            padding: 16px;
+        }
+
+        .find-replace-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .fr-input {
+            width: 100%;
+            padding: 9px 12px;
+            margin-bottom: 8px;
+            background: #0B101E;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            color: #f8fafc;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .fr-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .fr-input::placeholder {
+            color: #475569;
+        }
+
+        .fr-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .fr-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            color: #10b981;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .fr-btn:hover {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.25));
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .fr-btn:active {
+            transform: translateY(0);
+        }
+
+        .fr-result {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #64748b;
+            min-height: 16px;
+        }
+
+        .fr-result.success {
+            color: #10b981;
+        }
+
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .textarea-wrapper {
+            flex: 1;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #editor {
+            flex: 1;
+            width: 100%;
+            padding: 20px;
+            background: rgba(19, 27, 44, 0.4);
+            border: 1px solid rgba(30, 41, 59, 0.6);
+            border-radius: 12px;
+            color: #f8fafc;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #editor:focus {
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
+        }
+
+        #editor::placeholder {
+            color: #475569;
+        }
+
+        /* Navigation Button */
+        #navBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999999;
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #navBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(16, 185, 129, 0.6);
+        }
+
+        #navBtn:active {
+            transform: translateY(0);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 999998;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toolbar-panel {
+                display: none;
+            }
+
+            .header {
+                padding: 12px 16px;
+            }
+
+            .stats-bar {
+                padding: 8px 16px;
+                gap: 12px;
+            }
+
+            .textarea-wrapper {
+                padding: 12px;
+            }
+
+            .mobile-tools {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 8px 12px;
+                background: #131B2C;
+                border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+                overflow-x: auto;
+            }
+
+            .mobile-tool-btn {
+                padding: 6px 12px;
+                background: rgba(30, 41, 59, 0.4);
+                border: 1px solid #1e293b;
+                border-radius: 8px;
+                color: #94a3b8;
+                font-size: 11px;
+                font-weight: 600;
+                cursor: pointer;
+                white-space: nowrap;
+                font-family: inherit;
+            }
+
+            .mobile-tool-btn:active {
+                background: rgba(16, 185, 129, 0.15);
+                color: #10b981;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-tools {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div>
+                    <div class="header-title">Text Studio</div>
+                    <div class="header-subtitle">Write, transform, and analyze your text</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="wordCount">0</span>
+                <span class="stat-label">Words</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-value" id="charCount">0</span>
+                <span class="stat-label">Characters</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-value" id="charNoSpaceCount">0</span>
+                <span class="stat-label">Chars (no spaces)</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-value" id="sentenceCount">0</span>
+                <span class="stat-label">Sentences</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-value" id="lineCount">0</span>
+                <span class="stat-label">Lines</span>
+            </div>
+        </div>
+
+        <!-- Mobile Tools (visible on small screens) -->
+        <div class="mobile-tools">
+            <button class="mobile-tool-btn" onclick="toUpperCase()">UPPER</button>
+            <button class="mobile-tool-btn" onclick="toLowerCase()">lower</button>
+            <button class="mobile-tool-btn" onclick="toTitleCase()">Title</button>
+            <button class="mobile-tool-btn" onclick="toSentenceCase()">Sentence</button>
+            <button class="mobile-tool-btn" onclick="trimWhitespace()">Trim</button>
+            <button class="mobile-tool-btn" onclick="removeDuplicateLines()">Dedup</button>
+            <button class="mobile-tool-btn" onclick="copyText()">Copy</button>
+            <button class="mobile-tool-btn" onclick="clearText()">Clear</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Toolbar Panel (desktop) -->
+            <div class="toolbar-panel">
+                <!-- Case Conversion -->
+                <div class="tool-section">
+                    <div class="tool-section-title">Case Conversion</div>
+                    <button class="tool-btn" onclick="toUpperCase()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h4.5L12 4l4.5 16H21"/><path d="M6 14h12"/></svg>
+                        UPPERCASE
+                    </button>
+                    <button class="tool-btn" onclick="toLowerCase()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h4.5L12 4l4.5 16H21"/><path d="M6 14h12"/></svg>
+                        lowercase
+                    </button>
+                    <button class="tool-btn" onclick="toTitleCase()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M12 4v16"/><path d="M4 4h16"/></svg>
+                        Title Case
+                    </button>
+                    <button class="tool-btn" onclick="toSentenceCase()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+                        Sentence case
+                    </button>
+                </div>
+
+                <!-- Text Operations -->
+                <div class="tool-section">
+                    <div class="tool-section-title">Text Operations</div>
+                    <button class="tool-btn" onclick="trimWhitespace()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        Trim Whitespace
+                    </button>
+                    <button class="tool-btn" onclick="removeDuplicateLines()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
+                        Remove Duplicate Lines
+                    </button>
+                    <button class="tool-btn" onclick="sortLines()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="11" y2="6"/><line x1="4" y1="12" x2="11" y2="12"/><line x1="4" y1="18" x2="13" y2="18"/><polyline points="15 15 18 18 21 15"/><line x1="18" y1="6" x2="18" y2="18"/></svg>
+                        Sort Lines A-Z
+                    </button>
+                    <button class="tool-btn" onclick="reverseText()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                        Reverse Text
+                    </button>
+                </div>
+
+                <!-- Actions -->
+                <div class="tool-section">
+                    <div class="tool-section-title">Actions</div>
+                    <button class="tool-btn" onclick="copyText()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy to Clipboard
+                    </button>
+                    <button class="tool-btn" onclick="clearText()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        Clear All
+                    </button>
+                </div>
+
+                <!-- Find and Replace -->
+                <div class="find-replace-section">
+                    <div class="find-replace-title">Find &amp; Replace</div>
+                    <input type="text" class="fr-input" id="findInput" placeholder="Find text...">
+                    <input type="text" class="fr-input" id="replaceInput" placeholder="Replace with...">
+                    <div class="fr-actions">
+                        <button class="fr-btn" onclick="findAndReplace(false)">Replace</button>
+                        <button class="fr-btn" onclick="findAndReplace(true)">Replace All</button>
+                    </div>
+                    <div class="fr-result" id="frResult"></div>
+                </div>
+            </div>
+
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <div class="textarea-wrapper">
+                    <textarea id="editor" placeholder="Start typing or paste your text here...&#10;&#10;Use the tools on the left to transform your text, convert case, find and replace, and more."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Button -->
+    <button id="navBtn" onclick="navigateToProjects()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"></path>
+        </svg>
+        Back to Projects
+    </button>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const toast = document.getElementById('toast');
+
+        // Update stats on input
+        editor.addEventListener('input', updateStats);
+
+        function updateStats() {
+            const text = editor.value;
+
+            // Word count
+            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            document.getElementById('wordCount').textContent = words;
+
+            // Character count
+            document.getElementById('charCount').textContent = text.length;
+
+            // Characters without spaces
+            document.getElementById('charNoSpaceCount').textContent = text.replace(/\s/g, '').length;
+
+            // Sentence count
+            const sentences = text.trim() === '' ? 0 : text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            document.getElementById('sentenceCount').textContent = sentences;
+
+            // Line count
+            const lines = text === '' ? 0 : text.split('\n').length;
+            document.getElementById('lineCount').textContent = lines;
+        }
+
+        // Case conversions
+        function toUpperCase() {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            if (start !== end) {
+                const selected = editor.value.substring(start, end);
+                editor.value = editor.value.substring(0, start) + selected.toUpperCase() + editor.value.substring(end);
+            } else {
+                editor.value = editor.value.toUpperCase();
+            }
+            updateStats();
+            showToast('Converted to UPPERCASE');
+        }
+
+        function toLowerCase() {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            if (start !== end) {
+                const selected = editor.value.substring(start, end);
+                editor.value = editor.value.substring(0, start) + selected.toLowerCase() + editor.value.substring(end);
+            } else {
+                editor.value = editor.value.toLowerCase();
+            }
+            updateStats();
+            showToast('Converted to lowercase');
+        }
+
+        function toTitleCase() {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const convert = (str) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+
+            if (start !== end) {
+                const selected = editor.value.substring(start, end);
+                editor.value = editor.value.substring(0, start) + convert(selected) + editor.value.substring(end);
+            } else {
+                editor.value = convert(editor.value);
+            }
+            updateStats();
+            showToast('Converted to Title Case');
+        }
+
+        function toSentenceCase() {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const convert = (str) => {
+                return str.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g, (c) => c.toUpperCase());
+            };
+
+            if (start !== end) {
+                const selected = editor.value.substring(start, end);
+                editor.value = editor.value.substring(0, start) + convert(selected) + editor.value.substring(end);
+            } else {
+                editor.value = convert(editor.value);
+            }
+            updateStats();
+            showToast('Converted to Sentence case');
+        }
+
+        // Text operations
+        function trimWhitespace() {
+            editor.value = editor.value.split('\n').map(line => line.trim()).join('\n').replace(/\n{3,}/g, '\n\n');
+            updateStats();
+            showToast('Whitespace trimmed');
+        }
+
+        function removeDuplicateLines() {
+            const lines = editor.value.split('\n');
+            const unique = [...new Set(lines)];
+            const removed = lines.length - unique.length;
+            editor.value = unique.join('\n');
+            updateStats();
+            showToast(removed > 0 ? `Removed ${removed} duplicate line${removed > 1 ? 's' : ''}` : 'No duplicates found');
+        }
+
+        function sortLines() {
+            const lines = editor.value.split('\n');
+            editor.value = lines.sort((a, b) => a.localeCompare(b)).join('\n');
+            updateStats();
+            showToast('Lines sorted A-Z');
+        }
+
+        function reverseText() {
+            editor.value = editor.value.split('').reverse().join('');
+            updateStats();
+            showToast('Text reversed');
+        }
+
+        // Actions
+        function copyText() {
+            if (editor.value.trim() === '') {
+                showToast('Nothing to copy');
+                return;
+            }
+            navigator.clipboard.writeText(editor.value).then(() => {
+                showToast('Copied to clipboard');
+            }).catch(() => {
+                // Fallback
+                editor.select();
+                document.execCommand('copy');
+                showToast('Copied to clipboard');
+            });
+        }
+
+        function clearText() {
+            if (editor.value.trim() === '') return;
+            editor.value = '';
+            updateStats();
+            showToast('Text cleared');
+        }
+
+        // Find and Replace
+        function findAndReplace(replaceAll) {
+            const findText = document.getElementById('findInput').value;
+            const replaceText = document.getElementById('replaceInput').value;
+            const resultEl = document.getElementById('frResult');
+
+            if (!findText) {
+                resultEl.textContent = 'Enter text to find';
+                resultEl.className = 'fr-result';
+                return;
+            }
+
+            const occurrences = editor.value.split(findText).length - 1;
+
+            if (occurrences === 0) {
+                resultEl.textContent = 'No matches found';
+                resultEl.className = 'fr-result';
+                return;
+            }
+
+            if (replaceAll) {
+                editor.value = editor.value.split(findText).join(replaceText);
+                resultEl.textContent = `Replaced ${occurrences} occurrence${occurrences > 1 ? 's' : ''}`;
+            } else {
+                editor.value = editor.value.replace(findText, replaceText);
+                resultEl.textContent = `Replaced 1 of ${occurrences} occurrence${occurrences > 1 ? 's' : ''}`;
+            }
+
+            resultEl.className = 'fr-result success';
+            updateStats();
+        }
+
+        // Toast
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Navigation
+        function navigateToProjects() {
+            window.location.href = 'index.html';
+        }
+
+        // Initialize
+        updateStats();
+    </script>
+</body>
+</html>
