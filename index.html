@@ -5055,8 +5055,14 @@ root.render(/*#__PURE__*/React.createElement(App, null));
             const { projects } = data;
 
             // workspace state
-            const [workspaceProjectId, setWorkspaceProjectId] = useState(null);
-            const [workspaceTab, setWorkspaceTab] = useState('overview');
+            const [workspaceProjectId, setWorkspaceProjectId] = useState(() => {
+                try { const saved = localStorage.getItem('assetFlowPro_workspaceState'); if (saved) { const parsed = JSON.parse(saved); return parsed.workspaceProjectId || null; } } catch(e) {}
+                return null;
+            });
+            const [workspaceTab, setWorkspaceTab] = useState(() => {
+                try { const saved = localStorage.getItem('assetFlowPro_workspaceState'); if (saved) { const parsed = JSON.parse(saved); return parsed.workspaceTab || 'overview'; } } catch(e) {}
+                return 'overview';
+            });
 
             // modals
             const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -5089,6 +5095,17 @@ root.render(/*#__PURE__*/React.createElement(App, null));
                 window.addEventListener('jumpToSection', handleJump);
                 return () => window.removeEventListener('jumpToSection', handleJump);
             }, [onUpdate]);
+
+            useEffect(() => {
+                localStorage.setItem('assetFlowPro_workspaceState', JSON.stringify({ workspaceProjectId, workspaceTab }));
+            }, [workspaceProjectId, workspaceTab]);
+
+            useEffect(() => {
+                if (workspaceProjectId && !projects.find(p => p.id === workspaceProjectId)) {
+                    setWorkspaceProjectId(null);
+                    setWorkspaceTab('overview');
+                }
+            }, [projects, workspaceProjectId]);
 
             const openWorkspace = (projectId, tab = 'overview') => {
                 setWorkspaceProjectId(projectId);
@@ -5611,7 +5628,10 @@ root.render(/*#__PURE__*/React.createElement(App, null));
         };
 
         const App = () => {
-            const [activeTab, setActiveTab] = useState('projects');
+            const [activeTab, setActiveTab] = useState(() => {
+                try { const saved = localStorage.getItem('assetFlowPro_navState'); if (saved) { const parsed = JSON.parse(saved); if (parsed.activeTab) return parsed.activeTab; } } catch(e) {}
+                return 'projects';
+            });
             const [toastMsg, setToastMsg] = useState("");
             const [searchQuery, setSearchQuery] = useState("");
             const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -5623,7 +5643,10 @@ root.render(/*#__PURE__*/React.createElement(App, null));
             const [projectsData, setProjectsData] = useState(defaultProjects);
             const [isLoaded, setIsLoaded] = useState(false);
 
-            const [activeProjectId, setActiveProjectId] = useState(null);
+            const [activeProjectId, setActiveProjectId] = useState(() => {
+                try { const saved = localStorage.getItem('assetFlowPro_navState'); if (saved) { const parsed = JSON.parse(saved); if (parsed.activeProjectId) return parsed.activeProjectId; } } catch(e) {}
+                return null;
+            });
             const fileInputRef = useRef(null);
 
             const dragItemIndex = useRef(null);
@@ -5648,8 +5671,11 @@ root.render(/*#__PURE__*/React.createElement(App, null));
                 setSnippetsData(sData); setPalettesData(pData); setBookmarksData(bData); setProjectsData(projData); setIsLoaded(true);
                 
                 if (projData.projects && projData.projects.length > 0) {
-                    setActiveProjectId(projData.projects[0].id);
-                    setSidebarExpandedProjects({ [projData.projects[0].id]: true });
+                    const savedProjectId = activeProjectId;
+                    const savedProjectExists = savedProjectId && projData.projects.find(p => p.id === savedProjectId);
+                    const targetProjectId = savedProjectExists ? savedProjectId : projData.projects[0].id;
+                    setActiveProjectId(targetProjectId);
+                    setSidebarExpandedProjects({ [targetProjectId]: true });
                 }
                 
                 if (window.innerWidth < 1024) setIsSidebarOpen(false);
@@ -5666,6 +5692,12 @@ root.render(/*#__PURE__*/React.createElement(App, null));
                     localStorage.setItem('assetFlowPro_v9', JSON.stringify({ snippets: snippetsData, palettes: palettesData, bookmarks: bookmarksData, projects: projectsData }));
                 }
             }, [snippetsData, palettesData, bookmarksData, projectsData, isLoaded]);
+
+            useEffect(() => {
+                if (isLoaded) {
+                    localStorage.setItem('assetFlowPro_navState', JSON.stringify({ activeTab, activeProjectId }));
+                }
+            }, [activeTab, activeProjectId, isLoaded]);
 
             useEffect(() => {
                 const handleKeyDown = (e) => {
