@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://sumantinkerkt-prog.github.io/Creative-Assistance/sitemap.xml
