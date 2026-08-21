@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflow — Creative Assistance</title>
+  <meta name="description" content="Set up projects and move their tasks through Ideas, In Progress, Review and Done on a simple board.">
+  <meta name="theme-color" content="#6366f1">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+  <header class="site-head" data-site-head></header>
+
+  <main class="wrap">
+
+    <div class="page-head">
+      <span class="eyebrow">Workflow</span>
+      <h1>Projects &amp; tasks</h1>
+      <p>Add a project, add its tasks, then drag each card along as the work moves.
+         On a phone, use the arrow buttons on a card instead of dragging.</p>
+    </div>
+
+    <div class="stack-l">
+
+      <!-- Projects -->
+      <section class="card" aria-labelledby="projHeading">
+        <div class="card-head">
+          <div>
+            <h2 id="projHeading">Projects</h2>
+            <p class="card-sub">Pick one to filter the board below.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" type="button" id="addProjectBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            New project
+          </button>
+        </div>
+
+        <form class="stack" id="projectForm" hidden>
+          <div class="row" style="align-items:flex-end">
+            <div class="field grow" style="min-width:200px">
+              <label for="projectName">Project name</label>
+              <input class="input" type="text" id="projectName" maxlength="60" placeholder="e.g. Spring campaign" required>
+            </div>
+            <button class="btn btn-primary" type="submit">Add project</button>
+            <button class="btn btn-ghost" type="button" id="cancelProject">Cancel</button>
+          </div>
+        </form>
+
+        <div class="row" id="projectChips" style="margin-top:14px"></div>
+      </section>
+
+      <!-- Add a task -->
+      <section class="card" aria-labelledby="taskHeading">
+        <div class="card-head">
+          <div>
+            <h2 id="taskHeading">Add a task</h2>
+            <p class="card-sub" id="taskHint">Choose a project first.</p>
+          </div>
+        </div>
+
+        <form class="stack" id="taskForm">
+          <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+            <div class="field" style="grid-column:1/-1">
+              <label for="taskTitle">What needs doing?</label>
+              <input class="input" type="text" id="taskTitle" maxlength="120" placeholder="e.g. Draft the opening scene" required>
+            </div>
+            <div class="field">
+              <label for="taskProject">Project</label>
+              <select class="select" id="taskProject" required></select>
+            </div>
+            <div class="field">
+              <label for="taskStage">Stage</label>
+              <select class="select" id="taskStage"></select>
+            </div>
+            <div class="field">
+              <label for="taskPriority">Priority</label>
+              <select class="select" id="taskPriority"></select>
+            </div>
+            <div class="field">
+              <label for="taskDue">Due date <span class="muted">(optional)</span></label>
+              <input class="input" type="date" id="taskDue">
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="taskNotes">Notes <span class="muted">(optional)</span></label>
+              <textarea class="textarea" id="taskNotes" rows="2" maxlength="600" style="min-height:70px" placeholder="Anything you want to remember about this task"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" type="submit" id="taskSubmit">Add task</button>
+            <button class="btn btn-ghost" type="reset">Clear</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Board -->
+      <section aria-labelledby="boardHeading">
+        <div class="card-head">
+          <div>
+            <h2 id="boardHeading">The board</h2>
+            <p class="card-sub" id="boardSummary"></p>
+          </div>
+          <button class="btn btn-sm btn-danger" type="button" id="clearDoneBtn" hidden>Clear Done column</button>
+        </div>
+        <div id="boardHost"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-foot" data-site-foot></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/workflow.js"></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Essential Tools — Creative Assistance</title>
+  <meta name="description" content="Quick Notes, Word Counter, Focus Timer, Colour Palette and a Checklist — five handy creative tools that work right in your browser.">
+  <meta name="theme-color" content="#10b981">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+  <header class="site-head" data-site-head></header>
+
+  <main class="wrap">
+
+    <div class="page-head">
+      <span class="eyebrow" style="color:var(--tools)">Essential Tools</span>
+      <h1>Five things you reach for often</h1>
+      <p>Pick a tool below. Your notes, checklist and timer settings are remembered
+         in this browser, so they will still be here next time.</p>
+    </div>
+
+    <div class="tool-nav" id="toolNav" role="tablist" aria-label="Tools"></div>
+
+    <!-- Quick Notes -->
+    <section class="card" id="panel-notes" role="tabpanel" aria-labelledby="tab-notes" hidden>
+      <div class="card-head">
+        <div>
+          <h2>Quick Notes</h2>
+          <p class="card-sub">Jot something down before it slips away.</p>
+        </div>
+        <span class="badge" id="noteCount"></span>
+      </div>
+      <form class="stack" id="noteForm">
+        <div class="field">
+          <label for="noteInput" class="sr-only">Your note</label>
+          <textarea class="textarea" id="noteInput" rows="4" maxlength="2000" placeholder="Type a note, then press Save note…"></textarea>
+        </div>
+        <div class="row">
+          <button class="btn btn-tools" type="submit">Save note</button>
+          <span class="small muted" id="noteDraftHint"></span>
+        </div>
+      </form>
+      <hr class="sep">
+      <div class="stack" id="noteList"></div>
+    </section>
+
+    <!-- Word Counter -->
+    <section class="card" id="panel-counter" role="tabpanel" aria-labelledby="tab-counter" hidden>
+      <div class="card-head">
+        <div>
+          <h2>Word Counter</h2>
+          <p class="card-sub">Paste or type your text — the numbers update as you go.</p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="counterInput" class="sr-only">Text to count</label>
+        <textarea class="textarea" id="counterInput" rows="8" placeholder="Paste your writing here…"></textarea>
+      </div>
+      <div class="count-grid" id="counterStats" style="margin-top:16px"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn-sm" type="button" id="counterClear">Clear text</button>
+        <button class="btn btn-sm" type="button" id="counterCopy">Copy text</button>
+      </div>
+    </section>
+
+    <!-- Focus Timer -->
+    <section class="card" id="panel-timer" role="tabpanel" aria-labelledby="tab-timer" hidden>
+      <div class="card-head">
+        <div>
+          <h2>Focus Timer</h2>
+          <p class="card-sub">Work in a focused stretch, then take a short break.</p>
+        </div>
+        <span class="badge" id="timerRounds"></span>
+      </div>
+
+      <p class="timer-mode"><span class="badge" id="timerMode"></span></p>
+      <div class="timer-display" id="timerDisplay" role="timer" aria-live="off">25:00</div>
+      <div class="timer-ring"><span id="timerBar" style="width:0%"></span></div>
+
+      <div class="row" style="justify-content:center">
+        <button class="btn btn-tools" type="button" id="timerStart">Start</button>
+        <button class="btn" type="button" id="timerReset">Reset</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="timerSkip">Skip to break</button>
+      </div>
+
+      <hr class="sep">
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+        <div class="field">
+          <label for="focusMins">Focus minutes</label>
+          <input class="input" type="number" id="focusMins" min="1" max="180" step="1" value="25">
+        </div>
+        <div class="field">
+          <label for="breakMins">Break minutes</label>
+          <input class="input" type="number" id="breakMins" min="1" max="60" step="1" value="5">
+        </div>
+      </div>
+      <p class="small muted" style="margin-top:10px">A gentle chime plays when the time is up. Keep this tab open for the countdown to run.</p>
+    </section>
+
+    <!-- Colour Palette -->
+    <section class="card" id="panel-palette" role="tabpanel" aria-labelledby="tab-palette" hidden>
+      <div class="card-head">
+        <div>
+          <h2>Colour Palette</h2>
+          <p class="card-sub">Generate a set of colours that work together. Click one to copy its code.</p>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:16px">
+        <button class="btn btn-tools" type="button" id="paletteNew">New palette</button>
+        <div class="field" style="min-width:150px">
+          <label for="paletteMood" class="sr-only">Palette style</label>
+          <select class="select" id="paletteMood">
+            <option value="harmony">Harmonious</option>
+            <option value="warm">Warm</option>
+            <option value="cool">Cool</option>
+            <option value="pastel">Soft pastels</option>
+            <option value="bold">Bold</option>
+            <option value="mono">Single colour shades</option>
+          </select>
+        </div>
+      </div>
+      <div class="palette" id="paletteHost"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn-sm" type="button" id="paletteCopyAll">Copy all codes</button>
+        <button class="btn btn-sm" type="button" id="paletteSave">Keep this palette</button>
+      </div>
+      <div id="savedPalettes" style="margin-top:18px"></div>
+    </section>
+
+    <!-- Checklist -->
+    <section class="card" id="panel-checklist" role="tabpanel" aria-labelledby="tab-checklist" hidden>
+      <div class="card-head">
+        <div>
+          <h2>Checklist</h2>
+          <p class="card-sub">A simple list for today. Tick things off as you go.</p>
+        </div>
+        <span class="badge" id="checkCount"></span>
+      </div>
+      <form class="row" id="checkForm" style="margin-bottom:16px">
+        <div class="field grow" style="min-width:190px">
+          <label for="checkInput" class="sr-only">New list item</label>
+          <input class="input" type="text" id="checkInput" maxlength="160" placeholder="Add an item…" required>
+        </div>
+        <button class="btn btn-tools" type="submit">Add</button>
+      </form>
+      <div class="check-list" id="checkList"></div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn btn-sm" type="button" id="checkClearDone">Remove ticked items</button>
+        <button class="btn btn-sm btn-danger" type="button" id="checkClearAll">Clear the list</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-foot" data-site-foot></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/tools.js"></script>
+</body>
+</html>
